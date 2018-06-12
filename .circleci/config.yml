@@ -1,0 +1,217 @@
+palantir_aliases:
+  - &always-run
+    filters:
+      branches:
+        only: /.*/
+      tags:
+        only: /.*/
+
+version: 2
+jobs:
+
+  py27:
+    docker:
+      - image: circleci/python:2.7.15
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+
+      - restore_cache:
+          key: tox-v2-py27-{{ checksum "tox.ini" }}
+
+      - run:
+          name: Install tox things
+          command: if [ ! -d ".tox" ]; then python -m tox -e py27 --notest; fi
+
+      - save_cache:
+          key: tox-v2-py27-{{ checksum "tox.ini" }}
+          paths:
+            - .tox
+
+      - run: python -m tox -e py27
+
+      - run:
+          name: Collect JUnit XML
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+      - store_test_results:
+          path: ~/junit
+
+  py3:
+    docker:
+      - image: circleci/python:3.6.5
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+
+      - restore_cache:
+          key: tox-v2-py3-{{ checksum "tox.ini" }}
+
+      - run:
+          name: Install tox things
+          command: if [ ! -d ".tox" ]; then python -m tox -e py3 --notest; fi
+
+      - save_cache:
+          key: tox-v2-py3-{{ checksum "tox.ini" }}
+          paths:
+            - .tox
+
+      - run: python -m tox -e py3
+
+      - run:
+          name: Collect JUnit XML
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+      - store_test_results:
+          path: ~/junit
+
+  mypy27:
+    docker:
+      - image: circleci/python:3.6.5
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+
+      - restore_cache:
+          key: tox-v2-mypy27-{{ checksum "tox.ini" }}
+
+      - run:
+          name: Install tox things
+          command: if [ ! -d ".tox" ]; then python -m tox -e mypy27 --notest; fi
+
+      - save_cache:
+          key: tox-v2-mypy27-{{ checksum "tox.ini" }}
+          paths:
+            - .tox
+
+      - run: python -m tox -e mypy27
+
+      - run:
+          name: Collect JUnit XML
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+      - store_test_results:
+          path: ~/junit
+
+  mypy3:
+    docker:
+      - image: circleci/python:3.6.5
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+
+      - restore_cache:
+          key: tox-v2-mypy3-{{ checksum "tox.ini" }}
+
+      - run:
+          name: Install tox things
+          command: if [ ! -d ".tox" ]; then python -m tox -e mypy3 --notest; fi
+
+      - save_cache:
+          key: tox-v2-mypy3-{{ checksum "tox.ini" }}
+          paths:
+            - .tox
+
+      - run: python -m tox -e mypy3
+
+      - run:
+          name: Collect JUnit XML
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+      - store_test_results:
+          path: ~/junit
+
+  lint:
+    docker:
+      - image: circleci/python:3.6.5
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+
+      - restore_cache:
+          key: tox-v2-lint-{{ checksum "tox.ini" }}
+
+      - run:
+          name: Install tox things
+          command: if [ ! -d ".tox" ]; then python -m tox -e lint --notest; fi
+
+      - save_cache:
+          key: tox-v2-lint-{{ checksum "tox.ini" }}
+          paths:
+            - .tox
+
+      - run: python -m tox -e lint
+
+      - run:
+          name: Collect JUnit XML
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*xml" -exec cp {} ~/junit/ \;
+          when: always
+
+      - store_test_results:
+          path: ~/junit
+
+  publish-wheel:
+    docker:
+      - image: circleci/python:3.6.5
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: pip install --user setuptools wheel
+
+      - run: python setup.py sdist bdist_wheel --universal
+
+      - store_artifacts:
+          path: dist
+          destination: dist
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - py27:
+          <<: *always-run
+      - py3:
+          <<: *always-run
+      - mypy27:
+          <<: *always-run
+      - mypy3:
+          <<: *always-run
+      - lint:
+          <<: *always-run
+      - publish-wheel:
+          requires:
+            - py27
+            - py3
+            - mypy27
+            - mypy3
+            - lint
+          filters:
+            tags: { only: /.*/ }
+            branches: { only: develop }
+
+
+notify:
+  webhooks:
+    - url: https://parana.palantir.build/hook
+

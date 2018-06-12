@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+    "python.unitTest.pyTestArgs": [
+        "--capture=no", "test"
+    ],
+    "python.unitTest.pyTestEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.formatting.provider": "none"
+}
