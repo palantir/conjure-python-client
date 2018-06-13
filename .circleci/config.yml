@@ -191,6 +191,8 @@ jobs:
     steps:
       - checkout
 
+      - run: conda install conda-build
+
       - run: ./scripts/build_conda_package.sh
 
       - store_artifacts:
