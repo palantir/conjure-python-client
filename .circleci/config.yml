@@ -187,33 +187,11 @@ jobs:
 
   publish-conda-package:
     docker:
-      - image: circleci/python:3.6.5
+      - image: continuumio/miniconda:4.5.4
     environment:
-      - MINICONDA: "$HOME/miniconda"
-      - CONDA: "$MINICONDA/bin/conda"
-      - CONDA_BUILD: "$MINICONDA/bin/conda-build"
+      - CONDA: "conda"
     steps:
       - checkout
-
-      - restore_cache:
-          key: miniconda
-
-      - |
-        if [[ ! -f $MINICONDA/.finished ]]; then
-          rm -rf $MINICONDA
-          bash ./scripts/Miniconda3.sh -b -p $MINICONDA
-          # Use --system so the settings are placed in $MINICONDA
-          # Add any other conda settings you like here
-          $CONDA config --system --add channels conda-forge
-          # If you'd like to make sure conda is up to date
-          $CONDA install conda conda-build anaconda-client --yes
-          touch $MINICONDA/.finished
-        fi
-
-        - save_cache:
-          key: miniconda
-          paths:
-            - $MINICONDA
 
       - run: ./scripts/build_conda_package.sh
 
