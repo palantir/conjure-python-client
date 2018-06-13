@@ -10,12 +10,12 @@ requirements:
   build:
     - python
     - setuptools
-    - enum34
+    - enum34      # [py<34]
     - requests
     - typing
 
   run:
-    - enum34
+    - enum34      # [py<34]
     - requests
     - typing
 
