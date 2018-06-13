@@ -8,23 +8,24 @@ source:
 requirements:
   # See here: https://conda.io/docs/spec.html?highlight=version#package-match-specifications
   build:
-    - python
+    - python {{python}}
     - setuptools
-    - enum34      # [py<34]
+    - enum34 # [py<34]
     - requests
     - typing
 
   run:
-    - enum34      # [py<34]
+    - enum34 # [py<34]
     - requests
     - typing
 
 build:
-  preserve_egg_dir: True
   noarch_python: True
 
 test:
-  imports: []
+  imports:
+    - conjure
+    - httpremoting
 
 about:
   home: https://github.palantir.build/foundry/conjure-python-client
