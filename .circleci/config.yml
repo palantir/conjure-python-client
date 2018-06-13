@@ -230,7 +230,9 @@ workflows:
             - mypy27
             - mypy3
             - lint
-          <<: *always-run
+          filters:
+            tags: { only: /.*/ }
+            branches: { only: develop }
 
 
 notify:
