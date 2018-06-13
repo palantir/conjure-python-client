@@ -188,9 +188,6 @@ jobs:
   publish-conda-package:
     docker:
       - image: continuumio/miniconda:4.5.4
-    environment:
-      - CONDA: "conda"
-      - CONDA_BUILD: "conda-build"
     steps:
       - checkout
 
