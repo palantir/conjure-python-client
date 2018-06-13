@@ -1,0 +1,30 @@
+package:
+  name: conjure
+  version: "{{ PACKAGE_VERSION }}"
+
+source:
+  - path: ../
+
+requirements:
+  # See here: https://conda.io/docs/spec.html?highlight=version#package-match-specifications
+  build:
+    - python
+    - setuptools
+    - enum34
+    - requests
+    - typing
+
+  run:
+    - enum34
+    - requests
+    - typing
+
+build:
+  preserve_egg_dir: True
+  noarch_python: True
+
+test:
+  imports: []
+
+about:
+  home: https://github.palantir.build/foundry/conjure-python-client

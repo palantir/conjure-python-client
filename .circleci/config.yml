@@ -185,6 +185,42 @@ jobs:
           path: dist
           destination: dist
 
+  publish-conda-package:
+    docker:
+      - image: circleci/python:3.6.5
+    environment:
+      - MINICONDA: "$HOME/miniconda"
+      - CONDA: "$MINICONDA/bin/conda"
+      - CONDA_BUILD: "$MINICONDA/bin/conda-build"
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: miniconda
+
+      - |
+        if [[ ! -f $MINICONDA/.finished ]]; then
+          rm -rf $MINICONDA
+          bash ./scripts/Miniconda3.sh -b -p $MINICONDA
+          # Use --system so the settings are placed in $MINICONDA
+          # Add any other conda settings you like here
+          $CONDA config --system --add channels conda-forge
+          # If you'd like to make sure conda is up to date
+          $CONDA install conda conda-build anaconda-client --yes
+          touch $MINICONDA/.finished
+        fi
+
+        - save_cache:
+          key: miniconda
+          paths:
+            - $MINICONDA
+
+      - run: ./scripts/build_conda_package.sh
+
+      - store_artifacts:
+          path: build/conda
+          destination: conda
+
 workflows:
   version: 2
   build:
@@ -209,6 +245,14 @@ workflows:
           filters:
             tags: { only: /.*/ }
             branches: { only: develop }
+      - publish-conda-package:
+          requires:
+            - py27
+            - py3
+            - mypy27
+            - mypy3
+            - lint
+          <<: *always-run
 
 
 notify:
