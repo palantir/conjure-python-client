@@ -28,4 +28,4 @@ test:
     - httpremoting
 
 about:
-  home: https://github.palantir.build/foundry/conjure-python-client
+  home: https://github.com/palantir/conjure-python-client
