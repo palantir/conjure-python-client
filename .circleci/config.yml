@@ -185,6 +185,20 @@ jobs:
           path: dist
           destination: dist
 
+  publish-conda-package:
+    docker:
+      - image: continuumio/miniconda:4.5.4
+    steps:
+      - checkout
+
+      - run: conda install conda-build
+
+      - run: ./scripts/build_conda_package.sh
+
+      - store_artifacts:
+          path: build/conda
+          destination: conda
+
 workflows:
   version: 2
   build:
@@ -200,6 +214,16 @@ workflows:
       - lint:
           <<: *always-run
       - publish-wheel:
+          requires:
+            - py27
+            - py3
+            - mypy27
+            - mypy3
+            - lint
+          filters:
+            tags: { only: /.*/ }
+            branches: { only: develop }
+      - publish-conda-package:
           requires:
             - py27
             - py3
