@@ -223,8 +223,8 @@ workflows:
             - mypy3
             - lint
           filters:
-            tags: { only: /.*/ }
-            branches: { only: /.*/ }
+            tags: { only: /\d\.\d\./\d/ }
+            branches: { only: develop }
       - publish-conda-package:
           requires:
             - py27
