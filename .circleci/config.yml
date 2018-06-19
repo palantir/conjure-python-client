@@ -177,9 +177,11 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools wheel
+          command: pip install --user setuptools wheel twine
 
       - run: python setup.py sdist bdist_wheel --universal
+
+      - run: twine upload dist/*
 
       - store_artifacts:
           path: dist
