@@ -224,7 +224,7 @@ workflows:
             - lint
           filters:
             tags: { only: /\d\.\d\./\d/ }
-            branches: { only: develop }
+            branches: { only: /.*/ }
       - publish-conda-package:
           requires:
             - py27
