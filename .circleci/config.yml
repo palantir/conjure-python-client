@@ -181,7 +181,7 @@ jobs:
 
       - run: python setup.py sdist bdist_wheel --universal
 
-      - run: twine upload dist/*
+      - run: ~/.local/bin/twine upload dist/*
 
       - store_artifacts:
           path: dist
