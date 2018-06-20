@@ -66,7 +66,7 @@ class FormatCommand(Command):
 
 
 setup(
-    name="conjure-lib",
+    name="conjure-client",
     version=__version__,
     description="Conjure Python Library",
     # The project's main homepage.
