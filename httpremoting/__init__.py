@@ -23,7 +23,7 @@ import random
 from ._version import __version__
 
 
-class SslConfiguration:
+class SslConfiguration(object):
     trust_store_path = None  # type: str
 
     def __init__(self, trust_store_path):
@@ -31,7 +31,7 @@ class SslConfiguration:
         self.trust_store_path = trust_store_path
 
 
-class ServiceConfiguration:
+class ServiceConfiguration(object):
     api_token = None  # type: str
     security = SslConfiguration  # type: Any
     connect_timeout = None  # type: int
@@ -42,7 +42,7 @@ class ServiceConfiguration:
     backoff_slot_size = 500  # type: int
 
 
-class Service:
+class Service(object):
     _requests_session = None  # type: requests.Session
     _uris = None  # type: List[str]
 
@@ -114,7 +114,7 @@ class TransportAdapter(HTTPAdapter):
         )
 
 
-class RequestsClient:
+class RequestsClient(object):
 
     @classmethod
     def create(cls, service_class, user_agent, service_config):

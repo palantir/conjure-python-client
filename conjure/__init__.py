@@ -18,7 +18,7 @@ from enum import Enum
 from ._version import __version__
 
 
-class ConjureType:
+class ConjureType(object):
     pass
 
 
@@ -141,7 +141,7 @@ class ConjureUnionType(ConjureType):
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
 
 
-class ConjureFieldDefinition:
+class ConjureFieldDefinition(object):
     identifier = None  # type: str
     field_type = None  # type: ConjureTypeType
     optional = None  # type: bool
