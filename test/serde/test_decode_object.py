@@ -59,7 +59,7 @@ def test_object_with_missing_field_should_throw_helpful_exception():
         ConjureDecoder().read_from_string(
             """{"path": "bar", "redundant": 1}""", CreateDatasetRequest
         )
-    message_regex = re.compile("field file_system_id not found in object {.+}")
+    message_regex = re.compile("field fileSystemId not found in object {.+}")
     assert message_regex.match(str(excinfo.value)), excinfo.value
 
 
