@@ -47,7 +47,8 @@ class ConjureDecoder(object):
             field_identifier = field_definition.identifier
 
             if field_identifier not in obj or obj[field_identifier] is None:
-                cls.check_null_field(obj, deserialized, arg_name, field_definition)
+                cls.check_null_field(
+                    obj, deserialized, arg_name, field_definition)
             else:
                 value = obj[field_identifier]
                 field_type = field_definition.field_type
