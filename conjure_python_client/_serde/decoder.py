@@ -43,30 +43,33 @@ class ConjureDecoder(object):
             A instance of a bean of type conjure_type.
         """
         deserialized = {}  # type: Dict[str, Any]
-        for (arg_name, field_definition) in conjure_type._fields().items():
+        for (python_arg_name, field_definition) \
+                in conjure_type._fields().items():
             field_identifier = field_definition.identifier
 
             if field_identifier not in obj or obj[field_identifier] is None:
-                cls.check_null_field(obj, deserialized, field_definition)
+                cls.check_null_field(
+                    obj, deserialized, python_arg_name, field_definition)
             else:
                 value = obj[field_identifier]
                 field_type = field_definition.field_type
-                deserialized[arg_name] = cls.do_decode(value, field_type)
+                deserialized[python_arg_name] = \
+                    cls.do_decode(value, field_type)
         return conjure_type(**deserialized)
 
     @classmethod
-    def check_null_field(cls, obj, deserialized, field_definition):
-        field_identifier = field_definition.identifier
+    def check_null_field(
+            cls, obj, deserialized, python_arg_name, field_definition):
         if isinstance(field_definition.field_type, ListType):
-            deserialized[field_identifier] = []
+            deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
-            deserialized[field_identifier] = {}
+            deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
-            deserialized[field_identifier] = None
+            deserialized[python_arg_name] = None
         else:
             raise Exception(
                 "field {} not found in object {}".format(
-                    field_identifier, obj
+                    field_definition.identifier, obj
                 )
             )
 
