@@ -47,7 +47,7 @@ class ConjureDecoder(object):
             field_identifier = field_definition.identifier
 
             if field_identifier not in obj or obj[field_identifier] is None:
-                cls.check_null_field(obj, deserialized, field_definition)
+                cls.check_null_field(obj, deserialized, arg_name, field_definition)
             else:
                 value = obj[field_identifier]
                 field_type = field_definition.field_type
@@ -55,18 +55,17 @@ class ConjureDecoder(object):
         return conjure_type(**deserialized)
 
     @classmethod
-    def check_null_field(cls, obj, deserialized, field_definition):
-        field_identifier = field_definition.identifier
+    def check_null_field(cls, obj, deserialized, arg_name, field_definition):
         if isinstance(field_definition.field_type, ListType):
-            deserialized[field_identifier] = []
+            deserialized[arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
-            deserialized[field_identifier] = {}
+            deserialized[arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
-            deserialized[field_identifier] = None
+            deserialized[arg_name] = None
         else:
             raise Exception(
                 "field {} not found in object {}".format(
-                    field_identifier, obj
+                    arg_name, obj
                 )
             )
 
