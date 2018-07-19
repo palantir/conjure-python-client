@@ -26,7 +26,6 @@ client:
       '{"value":"2017-01-02T04:04:05.000000000+01:00[Europe/Berlin]"}'
     ]
     receiveDoubleExample: [
-      '{"value":13}',
       '{"value":"1.23"}',
       '{"value":"nan"}'
     ]
