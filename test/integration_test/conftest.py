@@ -32,7 +32,9 @@ VERIFICATION_API = path.dirname(__file__) + '/../../build/resources/verification
 @pytest.fixture(scope='module')
 def conjure_validation_server():
     verification_server = subprocess.Popen([
-        path.dirname(__file__) + '/../../build/downloads/bin/conjure-verification-server', TEST_CASES, VERIFICATION_API])
+        path.dirname(__file__) + '/../../build/downloads/bin/conjure-verification-server',
+        TEST_CASES,
+        VERIFICATION_API])
     yield verification_server
     verification_server.terminate()
 
