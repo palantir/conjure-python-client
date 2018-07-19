@@ -9,7 +9,7 @@ The team welcomes contributions!  To make code changes to one of the Conjure rep
 ## Local Development
 
 ### Prerequisites
-- Python2 (On macOS: `brew install python`)
+- Python2 (On macOS: `brew install python2`)
 - Python3 (On macOS: `brew install python3`)
 - [pipenv](https://github.com/pypa/pipenv) (`pip3 install pipenv`)
 
