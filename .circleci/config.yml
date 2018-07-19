@@ -204,13 +204,11 @@ jobs:
       - image: circleci/python:3.6.5
     steps:
       - checkout
-      - run:
+      - deploy:
           command: |
-            if echo "${CIRCLE_TAG}" | grep -Eq '[0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)*'; then
-              pip install --user setuptools wheel twine
-              python setup.py sdist bdist_wheel --universal
-              ~/.local/bin/twine upload dist/*
-            fi
+            pip install --user setuptools wheel twine
+            python setup.py sdist bdist_wheel --universal
+            ~/.local/bin/twine upload dist/*
 
 workflows:
   version: 2
@@ -241,4 +239,5 @@ workflows:
             - mypy3
             - lint
           filters:
-            tags: { only: /.*/ }
+            tags: { only: '/^[0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)*$/' }
+            branches: { ignore: /.*/ }
