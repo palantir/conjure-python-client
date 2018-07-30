@@ -56,9 +56,10 @@ class ConjureEncoder(json.JSONEncoder):
 
     @classmethod
     def encode_primitive(cls, obj):
-        # TODO(forozco): support inifinities
-        if isinstance(obj, float) and (isnan(obj) or isinf(obj)):
+        if isinstance(obj, float) and isnan(obj):
             return 'NaN'
+        if isinstance(obj, float) and isinf(obj):
+            return '{}Infinity'.format('-' if obj < 0 else '')
         return obj
 
     @classmethod

@@ -26,7 +26,11 @@ def test_nan_float_encodes():
     assert(encoded == 'NaN')
 
 
-def test_inf_float_encodes():
-    encoded = ConjureEncoder.encode_primitive(float('inf'))
-    assert(encoded == 'NaN')
+@pytest.mark.parametrize("value,expected_encoded", [
+    (float('inf'), 'Infinity'),
+    (-float('inf'), '-Infinity'),
+])
+def test_inf_float_encodes(value, expected_encoded):
+    encoded = ConjureEncoder.encode_primitive(value)
+    assert(encoded == expected_encoded)
 

@@ -2,7 +2,7 @@
 
 set -ex
 
-VERSION=3.3.0
+VERSION=3.4.0
 ARTIFACT_NAME="conjure-python-${VERSION}"
 DOWNLOAD_OUTPUT="build/downloads/conjure-python.tgz"
 
