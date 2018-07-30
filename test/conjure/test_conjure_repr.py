@@ -15,8 +15,8 @@
 import pytest
 from conjure_python_client import ServiceConfiguration, RequestsClient, Service
 from test.generated.conjure_verification import (
-    IntegerExample, StringExample, ListExample, MapExample,
-    OptionalExample, EnumExample, EnumFieldExample, EmptyObjectExample
+    IntegerExample, StringExample, ListExample, MapExample, OptionalExample,
+    EnumExample, EnumFieldExample, EmptyObjectExample, Union
 )
 
 @pytest.mark.parametrize('obj', [
@@ -28,8 +28,9 @@ from test.generated.conjure_verification import (
     OptionalExample('Hello World'),
     EnumFieldExample(EnumExample.ONE),
     EmptyObjectExample(),
-    # Union(string_example='Hello World'), # https://github.palantir.build/foundry/conjure-python/issues/66
-    # Union(this_field_is_an_integer=10)   # https://github.palantir.build/foundry/conjure-python/issues/66
+    Union(string_example='Hello World'),
+    Union(this_field_is_an_integer=10),
+    Union(if_=10)
 ])
 def test_repr(obj):
     assert eval(repr(obj)) == obj

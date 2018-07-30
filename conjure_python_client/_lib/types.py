@@ -15,6 +15,9 @@
 from typing import List, Dict, Type, Any, Union
 from enum import Enum
 
+from .case import to_snake_case
+from .sanitize import sanitize_identifier
+
 
 class ConjureType(object):
     pass
@@ -124,9 +127,13 @@ class ConjureUnionType(ConjureType):
             return False
 
         assert isinstance(other, ConjureUnionType)
-        return other.type == self.type and getattr(self, self.type) == getattr(
-            other, self.type
-        )
+
+        pythonic_sanitized_identifier = \
+            sanitize_identifier(to_snake_case(self.type))
+
+        return other.type == self.type and \
+            getattr(self, pythonic_sanitized_identifier) == \
+            getattr(other, pythonic_sanitized_identifier)
 
     def __ne__(self, other):
         # type: (Any) -> bool
