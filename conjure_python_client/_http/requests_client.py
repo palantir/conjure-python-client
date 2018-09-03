@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List
+from typing import TypeVar, Type, List, Dict
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
@@ -76,7 +76,7 @@ class Service(object):
         try:
             _response.raise_for_status()
         except HTTPError as e:
-            detail = {} # type: Dict[str, Any]
+            detail = {}  # type: Dict[str, Any]
             if e.response is not None and e.response.content:
                 try:
                     detail = e.response.json()
