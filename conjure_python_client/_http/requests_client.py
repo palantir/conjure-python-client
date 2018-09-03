@@ -80,7 +80,7 @@ class Service(object):
                 try:
                     detail = e.response.json()
                 except ValueError:
-                    detail = {}
+                    detail = {'message': e.response.content}
             else:
                 detail = {}
             raise HTTPError(
