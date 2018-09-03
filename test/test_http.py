@@ -77,3 +77,18 @@ class TestHttpRemoting(object):
             self._test_service().testEndpoint('foo')
         assert e.match("Default:NotFound")
         assert e.match("00000000-0000-0000-0000-000000000000")
+
+    @mock.patch('requests.Session.request')
+    def test_http_error_not_json(self, mock_request):
+        resp = requests.Response()
+        resp.status_code = 404
+        resp._content = b'Content that\'s not JSON'
+        http_error = HTTPError("something", response=resp)
+        mock_request.return_value = self._mock_response(
+            status=404,
+            raise_for_status=http_error)
+
+        with pytest.raises(HTTPError) as e:
+            self._test_service().testEndpoint('foo')
+        assert e.match("UnknownError")
+        assert e.match("Content that's not JSON")
