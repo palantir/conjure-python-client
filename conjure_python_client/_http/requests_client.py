@@ -77,7 +77,10 @@ class Service(object):
             _response.raise_for_status()
         except HTTPError as e:
             if e.response is not None and e.response.content:
-                detail = e.response.json()
+                try:
+                    detail = e.response.json()
+                except ValueError:
+                    detail = {'message': e.response.content}
             else:
                 detail = {}
             raise HTTPError(
