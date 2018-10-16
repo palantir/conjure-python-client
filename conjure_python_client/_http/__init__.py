@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from .configuration import SslConfiguration, ServiceConfiguration
-from .requests_client import RequestsClient, Service
+from .requests_client import RequestsClient, Service, ConjureHTTPError
 
 __all__ = [
-    'SslConfiguration', 'ServiceConfiguration', 'RequestsClient', 'Service'
+    'SslConfiguration', 'ServiceConfiguration', 'RequestsClient', 'Service', 'ConjureHTTPError'
 ]

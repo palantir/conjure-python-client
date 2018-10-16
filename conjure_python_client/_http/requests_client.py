@@ -19,6 +19,7 @@ from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
+from future.utils import raise_from
 import requests
 import random
 
@@ -76,21 +77,9 @@ class Service(object):
         try:
             _response.raise_for_status()
         except HTTPError as e:
-            if e.response is not None and e.response.content:
-                try:
-                    detail = e.response.json()
-                except ValueError:
-                    detail = {'message': e.response.content}
-            else:
-                detail = {}
-            raise HTTPError(
-                'Error Name: {}. Message: {}'.format(
-                    detail.get('errorName', 'UnknownError'),
-                    detail.get('message', 'No Message'),
-                ),
-                response=_response,
-            )
-
+            if e.response is not None and e.response.content is not None:
+                raise_from(ConjureHTTPError(e.response, e), e)
+            raise e
         return _response
 
     def __repr__(self):
@@ -142,3 +131,67 @@ class TransportAdapter(HTTPAdapter):
             ssl_context=ssl_context,
             **pool_kwargs
         )
+
+
+class ConjureHTTPError(Exception):
+    """A ``SerializableError`` from a Conjure Service."""
+
+    _cause = None               # type: Optional[Exception]
+    _error_code = None          # type: str
+    _error_name = None          # type: str
+    _error_instance_id = None   # type: str
+    _parameters = None          # type: Dict[str, str]
+    _trace_id = None            # type: str
+
+    def __init__(self, response, cause=None):
+            # type (str, Dict[str, Any], Dict[str, Any])
+            self._cause = cause
+            try:
+                detail = response.json()
+                self._error_code = detail.get("errorCode")
+                self._error_name = detail.get("errorName")
+                self._error_instance_id = detail.get("errorInstanceId")
+                self._parameters = detail.get("parameters", dict())
+                self._trace_id = response.headers.get('X-B3-TraceId')
+                message = "{}. ErrorCode: '{}'. ErrorName: '{}'. " \
+                    "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}".format(
+                    cause,
+                    self._error_code,
+                    self._error_name,
+                    self._error_instance_id,
+                    self._trace_id,
+                    self._parameters
+                )
+            except ValueError:
+                message = response.text
+            super(ConjureHTTPError, self).__init__(message)
+
+    @property
+    def cause(self):
+        # type: () -> Optional[Exception]
+        """The wrapped ``Exception`` that was the direct cause of the ``ConjureHTTPError``."""
+        return self._cause
+
+    @property
+    def error_code(self):
+        # type: () -> str
+        """A fixed code word identifying the type of error."""
+        return self._error_code
+
+    @property
+    def error_name(self):
+        # type: () -> str
+        """A fixed name identifying the error."""
+        return self._error_name
+
+    @property
+    def error_instance_id(self):
+        # type: () -> str
+        """A unique identifier for this error instance."""
+        return self._error_intance_id
+
+    @property
+    def parameters(self):
+        # type: () -> Dict[str, str]
+        """A set of parameters that further explain the error."""
+        return self._parameters
