@@ -81,12 +81,14 @@ class Service(object):
                     detail = e.response.json()
                 except ValueError:
                     detail = {'message': e.response.content}
+                detail['traceId'] = e.response.headers.get('X-B3-TraceId'),
             else:
                 detail = {}
             raise HTTPError(
-                'Error Name: {}. Message: {}'.format(
+                'Error Name: {}. TraceId {}. Message: {}.'.format(
                     detail.get('errorName', 'UnknownError'),
-                    detail.get('message', 'No Message'),
+                    detail.get('traceId', 'No TraceId'),
+                    detail.get('message', 'No Message')
                 ),
                 response=_response,
             )
