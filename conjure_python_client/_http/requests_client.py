@@ -84,9 +84,10 @@ class Service(object):
             else:
                 detail = {}
             raise HTTPError(
-                'Error Name: {}. Message: {}'.format(
+                'Error Name: {}. TraceId {}. Message: {}.'.format(
                     detail.get('errorName', 'UnknownError'),
-                    detail.get('message', 'No Message'),
+                    e.response.headers.get('X-B3-TraceId', 'No TraceId'),
+                    detail.get('message', 'No Message')
                 ),
                 response=_response,
             )
