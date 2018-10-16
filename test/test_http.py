@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from conjure_python_client import RequestsClient, ServiceConfiguration
+from conjure_python_client import ConjureHTTPError, RequestsClient, ServiceConfiguration
 import mock
 import pytest
 import requests
@@ -64,16 +64,13 @@ class TestHttpRemoting(object):
         resp._content = b'{"errorCode":"NOT_FOUND",' \
             + b'"errorName":"Default:NotFound",' \
             + b'"errorInstanceId":"00000000-0000-0000-0000-000000000000",' \
-            + b'"parameters":{},' \
-            + b'"exceptionClass":"javax.ws.rs.NotFoundException",' \
-            + b'"message":"Refer to the server logs with this errorInstanceId:' \
-            + b' 00000000-0000-0000-0000-000000000000"}'
+            + b'"parameters":{}}'
         http_error = HTTPError("something", response=resp)
         mock_request.return_value = self._mock_response(
             status=404,
             raise_for_status=http_error)
 
-        with pytest.raises(HTTPError) as e:
+        with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
         assert e.match("Default:NotFound")
         assert e.match("00000000-0000-0000-0000-000000000000")
@@ -88,7 +85,6 @@ class TestHttpRemoting(object):
             status=404,
             raise_for_status=http_error)
 
-        with pytest.raises(HTTPError) as e:
+        with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
-        assert e.match("UnknownError")
         assert e.match("Content that's not JSON")

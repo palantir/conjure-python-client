@@ -84,7 +84,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["enum34", "requests", "typing"],
+    install_requires=["enum34", "future", "requests", "typing"],
     tests_require=["pytest", "pyyaml"],
     cmdclass={"format": FormatCommand},
 )

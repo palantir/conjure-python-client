@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List
+from typing import TypeVar, Type, List, Optional, Dict
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
@@ -154,14 +154,15 @@ class ConjureHTTPError(Exception):
                 self._parameters = detail.get("parameters", dict())
                 self._trace_id = response.headers.get('X-B3-TraceId')
                 message = "{}. ErrorCode: '{}'. ErrorName: '{}'. " \
-                    "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}".format(
-                    cause,
-                    self._error_code,
-                    self._error_name,
-                    self._error_instance_id,
-                    self._trace_id,
-                    self._parameters
-                )
+                    "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}" \
+                    .format(
+                        cause,
+                        self._error_code,
+                        self._error_name,
+                        self._error_instance_id,
+                        self._trace_id,
+                        self._parameters
+                    )
             except ValueError:
                 message = response.text
             super(ConjureHTTPError, self).__init__(message)
@@ -169,7 +170,9 @@ class ConjureHTTPError(Exception):
     @property
     def cause(self):
         # type: () -> Optional[Exception]
-        """The wrapped ``Exception`` that was the direct cause of the ``ConjureHTTPError``."""
+        """The wrapped ``Exception`` that was the direct cause of
+        the ``ConjureHTTPError``.
+        """
         return self._cause
 
     @property
@@ -188,7 +191,7 @@ class ConjureHTTPError(Exception):
     def error_instance_id(self):
         # type: () -> str
         """A unique identifier for this error instance."""
-        return self._error_intance_id
+        return self._error_instance_id
 
     @property
     def parameters(self):

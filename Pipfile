@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 "enum34" = "*"
+future = "*"
 requests = "*"
 typing = "*"
 

@@ -16,5 +16,6 @@ from .configuration import SslConfiguration, ServiceConfiguration
 from .requests_client import RequestsClient, Service, ConjureHTTPError
 
 __all__ = [
-    'SslConfiguration', 'ServiceConfiguration', 'RequestsClient', 'Service', 'ConjureHTTPError'
+    'SslConfiguration', 'ServiceConfiguration', 'RequestsClient', 'Service',
+    'ConjureHTTPError'
 ]
