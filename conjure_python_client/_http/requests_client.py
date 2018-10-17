@@ -78,7 +78,7 @@ class Service(object):
             _response.raise_for_status()
         except HTTPError as e:
             if e.response is not None and e.response.content is not None:
-                raise_from(ConjureHTTPError(e.response, e), e)
+                raise_from(ConjureHTTPError(e), e)
             raise e
         return _response
 
@@ -133,44 +133,49 @@ class TransportAdapter(HTTPAdapter):
         )
 
 
-class ConjureHTTPError(Exception):
-    """A ``SerializableError`` from a Conjure Service."""
+class ConjureHTTPError(HTTPError):
+    """A an HTTPError from a Conjure Service with ``SerializableError``
+    attributes extracted from the response."""
 
-    _cause = None               # type: Optional[Exception]
+    _cause = None               # type: Optional[HTTPError]
     _error_code = None          # type: str
     _error_name = None          # type: str
     _error_instance_id = None   # type: str
     _parameters = None          # type: Dict[str, str]
     _trace_id = None            # type: str
 
-    def __init__(self, response, cause=None):
-            # type (str, Dict[str, Any], Dict[str, Any])
-            self._cause = cause
-            try:
-                detail = response.json()
-                self._error_code = detail.get("errorCode")
-                self._error_name = detail.get("errorName")
-                self._error_instance_id = detail.get("errorInstanceId")
-                self._parameters = detail.get("parameters", dict())
-                self._trace_id = response.headers.get('X-B3-TraceId')
-                message = "{}. ErrorCode: '{}'. ErrorName: '{}'. " \
-                    "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}" \
-                    .format(
-                        cause,
-                        self._error_code,
-                        self._error_name,
-                        self._error_instance_id,
-                        self._trace_id,
-                        self._parameters
-                    )
-            except ValueError:
-                message = response.text
-            super(ConjureHTTPError, self).__init__(message)
+    def __init__(self, http_error):
+        # type (HTTPError) -> None
+        self._cause = http_error
+        try:
+            detail = http_error.response.json()
+            self._error_code = detail.get("errorCode")
+            self._error_name = detail.get("errorName")
+            self._error_instance_id = detail.get("errorInstanceId")
+            self._parameters = detail.get("parameters", dict())
+            self._trace_id = http_error.response.headers.get('X-B3-TraceId')
+            message = "{}. ErrorCode: '{}'. ErrorName: '{}'. " \
+                "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}" \
+                .format(
+                    http_error,
+                    self._error_code,
+                    self._error_name,
+                    self._error_instance_id,
+                    self._trace_id,
+                    self._parameters
+                )
+        except ValueError:
+            message = http_error.response.text
+        super(ConjureHTTPError, self).__init__(
+            message,
+            request=http_error.request,
+            response=http_error.response
+        )
 
     @property
     def cause(self):
-        # type: () -> Optional[Exception]
-        """The wrapped ``Exception`` that was the direct cause of
+        # type: () -> Optional[HTTPError]
+        """The wrapped ``HTTPError`` that was the direct cause of
         the ``ConjureHTTPError``.
         """
         return self._cause
@@ -198,3 +203,9 @@ class ConjureHTTPError(Exception):
         # type: () -> Dict[str, str]
         """A set of parameters that further explain the error."""
         return self._parameters
+
+    @property
+    def trace_id(self):
+        # type: () -> str
+        """The X-B3-TraceId for the request."""
+        return self._trace_id
