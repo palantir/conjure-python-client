@@ -47,14 +47,14 @@ jobs:
           command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
-          key: tox-v2-py27-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-py27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
 
       - run:
           name: Install tox things
           command: if [ ! -d ".tox" ]; then python -m tox -e py27 --notest; fi
 
       - save_cache:
-          key: tox-v2-py27-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-py27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
           paths:
             - .tox
 
@@ -82,14 +82,14 @@ jobs:
           command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
-          key: tox-v2-py3-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-py3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
 
       - run:
           name: Install tox things
           command: if [ ! -d ".tox" ]; then python -m tox -e py3 --notest; fi
 
       - save_cache:
-          key: tox-v2-py3-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-py3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
           paths:
             - .tox
 
@@ -114,14 +114,14 @@ jobs:
           command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
-          key: tox-v2-mypy27-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-mypy27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
 
       - run:
           name: Install tox things
           command: if [ ! -d ".tox" ]; then python -m tox -e mypy27 --notest; fi
 
       - save_cache:
-          key: tox-v2-mypy27-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-mypy27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
           paths:
             - .tox
 
@@ -146,14 +146,14 @@ jobs:
           command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
-          key: tox-v2-mypy3-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-mypy3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
 
       - run:
           name: Install tox things
           command: if [ ! -d ".tox" ]; then python -m tox -e mypy3 --notest; fi
 
       - save_cache:
-          key: tox-v2-mypy3-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-mypy3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
           paths:
             - .tox
 
@@ -178,14 +178,14 @@ jobs:
           command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
-          key: tox-v2-lint-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-lint-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
 
       - run:
           name: Install tox things
           command: if [ ! -d ".tox" ]; then python -m tox -e lint --notest; fi
 
       - save_cache:
-          key: tox-v2-lint-{{ checksum "tox.ini" }}-({ checksum "Pipefile.lock" })
+          key: tox-v2-lint-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
           paths:
             - .tox
 
