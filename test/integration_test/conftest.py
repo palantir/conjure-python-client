@@ -25,8 +25,8 @@ from ..generated.conjure_verification_server import (
     SingleQueryParamService
 )
 
-TEST_CASES = path.dirname(__file__) + '/../../build/resources/test-cases.json'
-VERIFICATION_API = path.dirname(__file__) + '/../../build/resources/verification-api.conjure.json'
+TEST_CASES = path.dirname(__file__) + '/../../build/resources/verification-server-test-cases.json'
+VERIFICATION_API = path.dirname(__file__) + '/../../build/resources/verification-server-api.conjure.json'
 
 
 @pytest.fixture(scope='module')
