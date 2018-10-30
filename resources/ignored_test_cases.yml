@@ -27,8 +27,14 @@ client:
     ]
     receiveDoubleExample: [
       '{"value":"1.23"}',
-      '{"value":"nan"}'
+      '{"value":"nan"}',
     ]
+    receiveDoubleAliasExample:
+      - '"nan"'
+      - '"NAN"'
+      - '"infinity"'
+      - '"-infinity"'
+      - '"+Infinity"'
     # python int range is over-permissive compared to spec
     receiveIntegerExample: [
       '{"value":-2147483649}',
@@ -76,6 +82,9 @@ client:
     receiveUuidExample: [
       '{"value":""}',
       '{"value":"80e6dd13-5f42-4e33-ad18"}'
+    ]
+    receiveRawOptionalExample: [
+      'null',
     ]
   singleHeaderService: {}
   singlePathParamService:
