@@ -14,7 +14,7 @@
 
 import pytest
 from conjure_python_client import ServiceConfiguration, RequestsClient, Service
-from test.generated.conjure_verification import (
+from test.generated.conjure_verification_server import (
     IntegerExample, StringExample, ListExample, MapExample, OptionalExample,
     EnumExample, EnumFieldExample, EmptyObjectExample, Union
 )

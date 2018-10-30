@@ -17,7 +17,7 @@ import subprocess
 from os import path
 import yaml
 from conjure_python_client import RequestsClient, ServiceConfiguration
-from ..generated.conjure_verification import (
+from ..generated.conjure_verification_server import (
     AutoDeserializeConfirmService,
     AutoDeserializeService,
     SingleHeaderService,
