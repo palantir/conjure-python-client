@@ -15,10 +15,7 @@
 import re
 import pytest
 import json
-from os import path
-
-CUR_DIR = path.dirname(__file__)
-TEST_CASES = CUR_DIR + '/../../build/resources/test-cases.json'
+from .conftest import TEST_CASES
 
 
 def convert_to_snake_case(name):
