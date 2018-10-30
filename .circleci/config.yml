@@ -15,16 +15,8 @@ jobs:
       - checkout
 
       - run:
-          name: Download test server
-          command: ./scripts/download_test_server.sh
-
-      - run:
-          name: Download conjure-python
-          command: ./scripts/download_conjure_python.sh
-
-      - run:
-          name: Generate verification bindings
-          command: ./scripts/generate_test_bindings.sh
+          name: Prepare integration tests
+          command: ./scripts/prepare_integration_tests.sh
 
       - persist_to_workspace:
           root: '.'
