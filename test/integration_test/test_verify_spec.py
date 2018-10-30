@@ -15,10 +15,7 @@
 import re
 import pytest
 import json
-from os import path
-
-CUR_DIR = path.dirname(__file__)
-TEST_CASES = CUR_DIR + '/../../build/resources/test-cases.json'
+from .conftest import TEST_CASES
 
 
 def convert_to_snake_case(name):
@@ -53,14 +50,24 @@ def generate_param_tests(test_kind):
 
 def run_test(should_pass, is_blacklisted, runnable):
     # If the test is blacklisted, we inverse the logic, to ensure that it would have "failed" the normal test.
-    if should_pass ^ is_blacklisted:
+    if not is_blacklisted:
+        run_test_inner(runnable, should_pass)
+    else:
+        try:
+            run_test_inner(runnable, not should_pass)
+        except Exception:
+            pytest.fail("The test passed but the test case was ignored - remove this from ignored-test-cases.yml")
+        # If it did behave as intended, then skip it in the end if it was blacklisted.
+        pytest.skip("Blacklisted")
+
+
+def run_test_inner(runnable, should_succeed):
+    """Run the test, raising an exception if it succeeded but shouldn't have or vice versa"""
+    if should_succeed:
         runnable()
     else:
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, message="Expected test to fail"):
             runnable()
-    # If it did behave as intended, then skip it in the end if it was blacklisted.
-    if is_blacklisted:
-        pytest.skip("Blacklisted")
 
 
 @pytest.mark.parametrize('endpoint_name,method_name,index,case,should_pass', generate_auto_deserialize_tests())

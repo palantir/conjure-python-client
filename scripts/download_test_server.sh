@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-VERSION=0.7.0
-TEST_CASES="test-cases"
-API="verification-api"
+VERSION=0.12.1
+TEST_CASES="verification-server-test-cases"
+API="verification-server-api"
 SERVER="verification-server"
 
 DOWNLOADS_DIR=build/downloads
