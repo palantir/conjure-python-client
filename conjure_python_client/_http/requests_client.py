@@ -165,7 +165,7 @@ class ConjureHTTPError(HTTPError):
                     self._parameters
                 )
         except ValueError:
-            message = http_error.response.text
+            message = "{}. {}".format(http_error, http_error.response.text)
         super(ConjureHTTPError, self).__init__(
             message,
             request=http_error.request,
