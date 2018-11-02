@@ -102,4 +102,4 @@ class TestHttpRemoting(object):
 
         with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
-        assert e.match("mocked http error. ")
+        assert e.match("mocked http error. Response: ''")
