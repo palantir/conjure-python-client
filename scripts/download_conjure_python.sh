@@ -2,7 +2,7 @@
 
 set -ex
 
-VERSION=3.4.0
+VERSION="$(grep "^com.palantir.conjure.python:conjure-python" < versions.props | tail -1 | sed 's/^com.palantir.conjure.python:conjure-python = \(.*\)$/\1/')"
 ARTIFACT_NAME="conjure-python-${VERSION}"
 DOWNLOAD_OUTPUT="build/downloads/conjure-python.tgz"
 
