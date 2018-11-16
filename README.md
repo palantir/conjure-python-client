@@ -11,3 +11,6 @@ conjure-typescript-client leverages [requests](http://docs.python-requests.org/e
 ## Contributing
 
 See the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
+
+## License
+This project is made available under the [Apache 2.0 License](/LICENSE).
