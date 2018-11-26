@@ -117,7 +117,7 @@ class TestHttpRemoting(object):
 
         with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
-        assert e.match("mocked http error. TraceId: 'None'. Response: 'None'")
+        assert e.match("mocked http error. TraceId: 'None'. Response: ''")
 
 
     @mock.patch('requests.Session.request')
@@ -133,4 +133,4 @@ class TestHttpRemoting(object):
 
         with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
-        assert e.match("mocked http error. TraceId: 'faketraceid'. Response: 'None'")
+        assert e.match("mocked http error. TraceId: 'faketraceid'. Response: ''")
