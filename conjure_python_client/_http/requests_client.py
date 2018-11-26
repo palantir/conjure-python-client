@@ -77,7 +77,7 @@ class Service(object):
         try:
             _response.raise_for_status()
         except HTTPError as e:
-            if e.response is not None and e.response.content is not None:
+            if e.response is not None:
                 raise_from(ConjureHTTPError(e), e)
             raise e
         return _response
@@ -147,13 +147,13 @@ class ConjureHTTPError(HTTPError):
     def __init__(self, http_error):
         # type (HTTPError) -> None
         self._cause = http_error
+        self._trace_id = http_error.response.headers.get('X-B3-TraceId')
         try:
             detail = http_error.response.json()
             self._error_code = detail.get("errorCode")
             self._error_name = detail.get("errorName")
             self._error_instance_id = detail.get("errorInstanceId")
             self._parameters = detail.get("parameters", dict())
-            self._trace_id = http_error.response.headers.get('X-B3-TraceId')
             message = "{}. ErrorCode: '{}'. ErrorName: '{}'. " \
                 "ErrorInstanceId: '{}'. TraceId: '{}'. Parameters: {}" \
                 .format(
@@ -165,9 +165,10 @@ class ConjureHTTPError(HTTPError):
                     self._parameters
                 )
         except ValueError:
-            message = "{}. Response: '{}'"\
+            message = "{}. TraceId: '{}'. Response: '{}'"\
                 .format(
                     http_error,
+                    self._trace_id,
                     http_error.response.text
                 )
         super(ConjureHTTPError, self).__init__(
