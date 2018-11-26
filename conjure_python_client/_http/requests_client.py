@@ -77,7 +77,7 @@ class Service(object):
         try:
             _response.raise_for_status()
         except HTTPError as e:
-            if e.response is not None and e.response.content is not None:
+            if e.response is not None:
                 raise_from(ConjureHTTPError(e), e)
             raise e
         return _response
