@@ -24,7 +24,8 @@ class ConjureType(object):
 
 
 DecodableType = Union[
-    int, float, bool, str, ConjureType, List[Any], Dict[Any, Any], FrozenSet[Any]
+    int, float, bool, str, ConjureType,
+    List[Any], Dict[Any, Any], FrozenSet[Any]
 ]
 
 
@@ -135,7 +136,9 @@ class ConjureUnionType(ConjureType):
         return {}
 
     def __hash__(self):
-        values = tuple([getattr(self, attr) for attr, field_def in self._options().items()])
+        values = tuple([getattr(self, attr) for
+                        attr, field_def in
+                        self._options().items()])
         return hash(values)
 
     def __eq__(self, other):
