@@ -64,7 +64,7 @@ class ConjureDecoder(object):
         print field_definition
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
-        if isinstance(field_definition.field_type, SetType):
+        elif isinstance(field_definition.field_type, SetType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
