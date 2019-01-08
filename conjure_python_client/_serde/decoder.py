@@ -61,7 +61,6 @@ class ConjureDecoder(object):
     @classmethod
     def check_null_field(
             cls, obj, deserialized, python_arg_name, field_definition):
-        print field_definition
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, SetType):
