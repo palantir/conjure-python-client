@@ -75,9 +75,7 @@ class ConjureEncoder(json.JSONEncoder):
         elif isinstance(obj, ConjureEnumType):
             return obj.value
 
-        elif isinstance(obj, list) \
-             or isinstance(obj, frozenset) \
-             or isinstance(obj, set):
+        elif isinstance(obj, (set, frozenset, list)):
             return list(map(cls.do_encode, obj))
 
         elif isinstance(obj, dict):
