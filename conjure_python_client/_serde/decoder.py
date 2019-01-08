@@ -19,10 +19,11 @@ from .._lib import (
     ConjureUnionType,
     DictType,
     ListType,
-    OptionalType
+    OptionalType,
+    SetType
 )
 from typing import Optional
-from typing import Dict, Any, List
+from typing import Dict, Any, List, FrozenSet
 import inspect
 import json
 
@@ -60,7 +61,10 @@ class ConjureDecoder(object):
     @classmethod
     def check_null_field(
             cls, obj, deserialized, python_arg_name, field_definition):
+        print field_definition
         if isinstance(field_definition.field_type, ListType):
+            deserialized[python_arg_name] = []
+        if isinstance(field_definition.field_type, SetType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
@@ -99,7 +103,7 @@ class ConjureDecoder(object):
 
         deserialized = {}  # type: Dict[str, Any]
         if type_of_union not in obj or obj[type_of_union] is None:
-            cls.check_null_field(obj, deserialized, conjure_field_definition)
+            cls.check_null_field(obj, deserialized, attr, conjure_field_definition)
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
@@ -175,6 +179,24 @@ class ConjureDecoder(object):
         return list(map(lambda x: cls.do_decode(x, element_type), obj))
 
     @classmethod
+    def decode_set(cls, obj, element_type):
+        # type: (List[Any], ConjureTypeType) -> FrozenSet[Any]
+        """Decodes json into a frozenset, handling conversion of the elements.
+
+        Args:
+            obj: the json object to decode
+            element_type: a class object which is the conjure type of
+                the elements in this list.
+        Returns:
+            A python frozenset where the elements are instances of type
+                element_type.
+        """
+        if not isinstance(obj, list):
+            raise Exception("expected a python list")
+
+        return frozenset(map(lambda x: cls.do_decode(x, element_type), obj))
+
+    @classmethod
     def decode_optional(cls, obj, object_type):
         # type: (Optional[Any], ConjureTypeType) -> Optional[Any]
         """Decodes json into an element, returning None if the provided object
@@ -243,6 +265,9 @@ class ConjureDecoder(object):
 
         elif isinstance(obj_type, OptionalType):
             return cls.decode_optional(obj, obj_type.item_type)
+
+        elif isinstance(obj_type, SetType):
+            return cls.decode_set(obj, obj_type.item_type)
 
         return cls.decode_primitive(obj, obj_type)
 

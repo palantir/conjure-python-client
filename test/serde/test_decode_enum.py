@@ -12,27 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ._serde import *
-from ._http import *
-from ._lib import *
-from ._version import __version__
+import pytest
+from conjure_python_client import ConjureDecoder, ConjureEnumType
 
-__all__ = [
-    'BinaryType',
-    'ConjureBeanType',
-    'ConjureDecoder',
-    'ConjureEncoder',
-    'ConjureEnumType',
-    'ConjureFieldDefinition',
-    'ConjureType',
-    'ConjureUnionType',
-    'DecodableType',
-    'DictType',
-    'ListType',
-    'OptionalType',
-    'RequestsClient',
-    'Service',
-    'ServiceConfiguration',
-    'SetType',
-    'SslConfiguration',
-]
+
+class TestEnum(ConjureEnumType):
+    A = 1
+    B = 2
+    C = 3
+
+def test_enum_decode():
+    decoded_A = ConjureDecoder().read_from_string("\"A\"", TestEnum)
+    decoded_B = ConjureDecoder().read_from_string("\"B\"", TestEnum)
+    decoded_A2 = ConjureDecoder().read_from_string("\"A\"", TestEnum)
+    assert decoded_A != decoded_B
+    assert decoded_A == decoded_A2
+
+
+
+
