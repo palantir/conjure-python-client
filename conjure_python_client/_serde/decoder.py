@@ -64,7 +64,7 @@ class ConjureDecoder(object):
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, SetType):
-            deserialized[python_arg_name] = []
+            deserialized[python_arg_name] = frozenset()
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
@@ -193,8 +193,8 @@ class ConjureDecoder(object):
             A python frozenset where the elements are instances of type
                 element_type.
         """
-        if not isinstance(obj, list):
-            raise TypeError("expected a python list")
+        if not isinstance(obj, (list, set, frozenset)):
+            raise TypeError("expected a python list, set or frozenset")
 
         return frozenset(map(lambda x: cls.do_decode(x, element_type), obj))
 

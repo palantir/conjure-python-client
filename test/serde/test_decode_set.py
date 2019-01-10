@@ -13,7 +13,48 @@
 # limitations under the License.
 
 import pytest
-from conjure_python_client import ConjureDecoder, ConjureEncoder, SetType
+from conjure_python_client import ConjureDecoder, ConjureEncoder, SetType, ConjureUnionType, ConjureFieldDefinition
+
+class TestUnion(ConjureUnionType):
+
+    _field_c = None 
+    _field_b = None 
+    _field_a = None 
+
+    @classmethod
+    def _options(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'field_c': ConjureFieldDefinition('fieldC', int),
+            'field_b': ConjureFieldDefinition('fieldB', str),
+            'field_a': ConjureFieldDefinition('fieldA', SetType(int))
+        }
+
+    def __init__(self, field_c=None, field_b=None, field_a=None):
+        if (field_c is not None) + (field_b is not None) + (field_a is not None) != 1:
+            raise ValueError('a union must contain a single member')
+
+        if field_c is not None:
+            self._field_c = field_c
+            self._type = 'fieldC'
+        if field_b is not None:
+            self._field_b = field_b
+            self._type = 'fieldB'
+        if field_a is not None:
+            self._field_a = field_a
+            self._type = 'fieldA'
+
+    @property
+    def field_c(self):
+        return self._field_c
+
+    @property
+    def field_b(self):
+        return self._field_b
+
+    @property
+    def field_a(self):
+        return self._field_a
 
 
 def test_set_with_well_typed_items_decodes():
@@ -21,6 +62,10 @@ def test_set_with_well_typed_items_decodes():
     assert type(decoded) is frozenset
     assert type(list(decoded)[0]) is int
 
+def test_set_in_enum_decode():
+    decoded = ConjureDecoder().read_from_string('{"type": "fieldA"}', TestUnion)
+    assert type(decoded.field_a) is frozenset
+    assert len(decoded.field_a) == 0
 
 def test_set_with_one_badly_typed_item_fails():
     with pytest.raises(Exception):
