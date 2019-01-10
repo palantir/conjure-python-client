@@ -48,6 +48,7 @@ class SetType(ConjureType):
     def item_type(self):
         return self._item_type
 
+
 class DictType(ConjureType):
     key_type = None  # type: Type[DecodableType]
     value_type = None  # type: Type[DecodableType]
