@@ -70,7 +70,7 @@ class ConjureDecoder(object):
         elif isinstance(field_definition.field_type, OptionalType):
             deserialized[python_arg_name] = None
         else:
-            raise Exception(
+            raise ValueError(
                 "field {} not found in object {}".format(
                     field_definition.identifier, obj
                 )
@@ -150,7 +150,7 @@ class ConjureDecoder(object):
             and the values are of type value_type.
         """
         if not isinstance(obj, dict):
-            raise Exception("expected a python dict")
+            raise TypeError("expected a python dict")
 
         return dict(
             map(
@@ -176,7 +176,7 @@ class ConjureDecoder(object):
                 element_type.
         """
         if not isinstance(obj, list):
-            raise Exception("expected a python list")
+            raise TypeError("expected a python list")
 
         return list(map(lambda x: cls.do_decode(x, element_type), obj))
 
@@ -194,7 +194,7 @@ class ConjureDecoder(object):
                 element_type.
         """
         if not isinstance(obj, list):
-            raise Exception("expected a python list")
+            raise TypeError("expected a python list")
 
         return frozenset(map(lambda x: cls.do_decode(x, element_type), obj))
 
@@ -219,7 +219,7 @@ class ConjureDecoder(object):
     @classmethod
     def decode_primitive(cls, obj, object_type):
         def raise_mismatch():
-            raise Exception(
+            raise TypeError(
                 'Expected to find {} type but found {} instead'.format(
                     object_type, type(obj)))
 

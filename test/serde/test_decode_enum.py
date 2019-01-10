@@ -1,3 +1,4 @@
+
 # (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +18,19 @@ from conjure_python_client import ConjureDecoder, ConjureEnumType
 
 
 class TestEnum(ConjureEnumType):
-    A = 1
-    B = 2
-    C = 3
+
+    A = 'A'
+    '''A'''
+    B = 'B'
+    '''B'''
+    C = 'C'
+    '''C'''
+    UNKNOWN = 'UNKNOWN'
+    '''UNKNOWN'''
+
+    def __reduce_ex__(self, proto):
+        return self.__class__, (self.name,)
+
 
 def test_enum_decode():
     decoded_A = ConjureDecoder().read_from_string("\"A\"", TestEnum)
@@ -28,6 +39,8 @@ def test_enum_decode():
     assert decoded_A != decoded_B
     assert decoded_A == decoded_A2
 
+    decoded_unk = ConjureDecoder().read_from_string("\"G\"", TestEnum)
+    assert repr(decoded_unk) == "TestEnum.UNKNOWN"
 
-
-
+    decoded_integer = ConjureDecoder().read_from_string("5", TestEnum)
+    assert repr(decoded_integer) == "TestEnum.UNKNOWN"

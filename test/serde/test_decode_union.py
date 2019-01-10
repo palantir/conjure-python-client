@@ -16,57 +16,78 @@ import pytest
 from conjure_python_client import ConjureDecoder, ListType, ConjureUnionType, ConjureFieldDefinition
 
 class TestUnion(ConjureUnionType):
-    _a = None
-    _b = None
-    _c = None
+
+    _field_c = None # type: int
+    _field_b = None # type: str
+    _field_a = None # type: List[int]
 
     @classmethod
     def _options(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'a': ConjureFieldDefinition('A', str),
-            'b': ConjureFieldDefinition('B', int),
-            'c': ConjureFieldDefinition('C', ListType(int))
-            }
+            'field_c': ConjureFieldDefinition('fieldC', int),
+            'field_b': ConjureFieldDefinition('fieldB', str),
+            'field_a': ConjureFieldDefinition('fieldA', ListType(int))
+        }
 
-    def __init__(self, a=None, b=None, c=None):
-        if a is not None:
-            self._a = a
-            self._type = 'A'
-        elif b is not None:
-            self._b = b
-            self._type = 'B'
-        elif c is not None:
-            self._c = c
-            self._type = 'C'
+    def __init__(self, field_c=None, field_b=None, field_a=None):
+        if (field_c is not None) + (field_b is not None) + (field_a is not None) != 1:
+            raise ValueError('a union must contain a single member')
 
-    @property
-    def a(self):
-        return self._a
-
-    @property
-    def b(self):
-        return self._b
+        if field_c is not None:
+            self._field_c = field_c
+            self._type = 'fieldC'
+        if field_b is not None:
+            self._field_b = field_b
+            self._type = 'fieldB'
+        if field_a is not None:
+            self._field_a = field_a
+            self._type = 'fieldA'
 
     @property
-    def c(self):
-        return self._c
+    def field_c(self):
+        # type: () -> int
+        return self._field_c
+
+    @property
+    def field_b(self):
+        # type: () -> str
+        return self._field_b
+
+    @property
+    def field_a(self):
+        # type: () -> List[int]
+        return self._field_a
+
+    def accept(self, visitor):
+        # type: (TestUnionVisitor) -> Any
+        if not isinstance(visitor, TestUnionVisitor):
+            raise ValueError('{} is not an instance of TestUnionVisitor'.format(visitor.__class__.__name__))
+        if self.type == 'fieldC':
+            return visitor._field_c(self.field_c)
+        if self.type == 'fieldB':
+            return visitor._field_b(self.field_b)
+        if self.type == 'fieldA':
+            return visitor._field_a(self.field_a)
 
 
 def test_union_decoder():
-    decoded_A = ConjureDecoder().read_from_string('{"type":"A", "A": "foo"}', TestUnion)
-    decoded_B = ConjureDecoder().read_from_string('{"type":"B", "B": 5}', TestUnion)
-    decoded_A2 = ConjureDecoder().read_from_string('{"type":"A", "A": "bar"}', TestUnion)
-    decoded_C = ConjureDecoder().read_from_string('{"type":"C"}', TestUnion)
+    decoded_A = ConjureDecoder().read_from_string('{"type":"fieldB", "fieldB": "foo"}', TestUnion)
+    decoded_B = ConjureDecoder().read_from_string('{"type":"fieldC", "fieldC": 5}', TestUnion)
+    decoded_A2 = ConjureDecoder().read_from_string('{"type":"fieldB", "fieldB": "bar"}', TestUnion)
+    decoded_A3 = ConjureDecoder().read_from_string('{"type":"fieldB", "fieldB": "bar"}', TestUnion)
+    decoded_C = ConjureDecoder().read_from_string('{"type":"fieldA"}', TestUnion)
     assert type(decoded_A) is TestUnion
     assert type(decoded_B) is TestUnion
     assert type(decoded_C) is TestUnion
     assert decoded_A != decoded_B
     assert decoded_A != decoded_A2
     assert decoded_C != decoded_A
-    assert not decoded_C.c
+    assert decoded_A3 == decoded_A2
+    assert not decoded_C.field_a
 
 def test_invalid_decode():
-    with pytest.raises(Exception):
-        decoded_invalid = ConjureDecoder().read_from_string('{"type":"A", "B": "bar"}', TestUnion)
+    with pytest.raises(ValueError):
+        decoded_invalid = ConjureDecoder().read_from_string('{"type":"fieldC", "fieldB": "bar"}', TestUnion)
     
 

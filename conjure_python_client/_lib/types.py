@@ -38,12 +38,15 @@ class ListType(ConjureType):
 
 
 class SetType(ConjureType):
-    item_type = None  # type: Type[DecodableType]
+    _item_type = None  # type: Type[DecodableType]
 
     def __init__(self, item_type):
         # type: (Type[DecodableType]) -> None
-        self.item_type = item_type
+        self._item_type = item_type
 
+    @property
+    def item_type(self):
+        return self._item_type
 
 class DictType(ConjureType):
     key_type = None  # type: Type[DecodableType]
