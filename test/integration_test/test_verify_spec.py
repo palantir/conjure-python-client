@@ -87,7 +87,7 @@ def test_body(
     if should_pass:
         run_test(True,
                  is_blacklisted,
-                 lambda: confirm_service.confirm(endpoint_name, index, getattr(body_service, method_name)(index)))
+                 lambda: confirm_service.confirm(getattr(body_service, method_name)(index), endpoint_name, index))
     else:
         run_test(False, is_blacklisted, lambda: getattr(body_service, method_name)(index))
 
