@@ -1,2 +1,2 @@
-com.palantir.conjure.python:conjure-python = 3.4.0
+com.palantir.conjure.python:conjure-python = 3.10.2
 com.palantir.conjure.verification:* = 0.16.6
