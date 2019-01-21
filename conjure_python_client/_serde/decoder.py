@@ -119,7 +119,8 @@ class ConjureDecoder(object):
         """
         if not (isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"):
             raise Exception(
-                'Expected to find str type but found {} instead'.format(type(obj)))
+                'Expected to find str type but found {} instead'.format(
+                    type(obj)))
 
         if obj in conjure_type.__members__:
             return conjure_type[obj]
@@ -149,11 +150,17 @@ class ConjureDecoder(object):
         """
         if not isinstance(obj, dict):
             raise Exception("expected a python dict")
-        if key_type == str or isinstance(key_type, BinaryType) or \
-            (inspect.isclass(key_type) and issubclass(key_type, ConjureEnumType)):
-            return dict(((cls.do_decode(x[0], key_type), cls.do_decode(x[1], item_type)) for x in obj.items()))
+        if key_type == str or isinstance(key_type, BinaryType) \
+            or (inspect.isclass(key_type)
+                and issubclass(key_type, ConjureEnumType)):
+            return dict((
+                (cls.do_decode(x[0], key_type), cls.do_decode(x[1], item_type))
+                for x in obj.items()))
 
-        return dict(((cls.do_decode(json.loads(x[0]), key_type), cls.do_decode(x[1], item_type)) for x in obj.items()))
+        return dict((
+            (cls.do_decode(json.loads(x[0]), key_type),
+             cls.do_decode(x[1], item_type))
+            for x in obj.items()))
 
     @classmethod
     def decode_list(cls, obj, element_type):
