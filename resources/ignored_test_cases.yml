@@ -86,7 +86,11 @@ client:
     receiveUuidExample:
     - '{"value":""}'
     - '{"value":"80e6dd13-5f42-4e33-ad18"}'
-  singleHeaderService: {}
+  # Optional arguments are ordered differently, causing the wrong parameters to be passed
+  singleHeaderService:
+    headerOptionalOfString:
+      - 'null'
+      - '"foo"'
   singlePathParamService:
     pathParamBoolean:
     - 'true'

@@ -97,7 +97,7 @@ def test_header(conjure_validation_server, test_black_list, header_service, endp
     header_black_list = test_black_list['singleHeaderService']
     is_blacklisted = endpoint_name in header_black_list and value in header_black_list[endpoint_name]
 
-    run_test(True, is_blacklisted, lambda: getattr(header_service, method_name)(index, json.loads(value)))
+    run_test(True, is_blacklisted, lambda: getattr(header_service, method_name)(json.loads(value), index))
 
 
 @pytest.mark.parametrize('endpoint_name,method_name,index,value', generate_param_tests('singlePathParamService'))
