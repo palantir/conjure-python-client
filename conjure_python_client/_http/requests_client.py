@@ -52,7 +52,7 @@ class Service(object):
     def __init__(
         self, requests_session, uris, _connect_timeout, _read_timeout
     ):
-        # type: (requests.Session, List[str]) -> None
+        # type: (requests.Session, List[str], float, float) -> None
         self._requests_session = requests_session
         self._uris = uris
         self._connect_timeout = _connect_timeout
