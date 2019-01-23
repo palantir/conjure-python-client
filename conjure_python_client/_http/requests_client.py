@@ -119,7 +119,7 @@ class RequestsClient(object):
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
         return service_class(
-            session, 
+            session,
             service_config.uris,
             service_config.connect_timeout,
             service_config.read_timeout
