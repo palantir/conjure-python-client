@@ -26,9 +26,8 @@ class SslConfiguration(object):
 class ServiceConfiguration(object):
     api_token = None  # type: str
     security = SslConfiguration  # type: Any
-    connect_timeout = None  # type: int
-    read_timeout = None  # type: int
-    write_timeout = None  # type: int
+    connect_timeout = 10  # type: float
+    read_timeout = 300  # type: float
     uris = []  # type: List[str]
     max_num_retries = 3  # type: int
     backoff_slot_size = 500  # type: int

@@ -46,11 +46,15 @@ CIPHERS = (
 class Service(object):
     _requests_session = None  # type: requests.Session
     _uris = None  # type: List[str]
+    _connect_timeout = None # type: float
+    _read_timeout = None # type: float
 
-    def __init__(self, requests_session, uris):
+    def __init__(self, requests_session, uris, _connect_timeout, _read_timeout):
         # type: (requests.Session, List[str]) -> None
         self._requests_session = requests_session
         self._uris = uris
+        self._connect_timeout = _connect_timeout
+        self._read_timeout = _read_timeout
 
     @property
     def _uri(self):
@@ -72,6 +76,8 @@ class Service(object):
                     cleaned_params[key] = str(value).lower() \
                         if isinstance(value, bool) else str(value)
                 kwargs[param_kind] = cleaned_params
+        
+        kwargs['timeout'] = (self._connect_timeout, self._read_timeout)
 
         _response = self._requests_session.request(*args, **kwargs)
         try:
@@ -110,7 +116,12 @@ class RequestsClient(object):
             session.verify = service_config.security.trust_store_path
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
-        return service_class(session, service_config.uris)  # type: ignore
+        return service_class(
+            session, 
+            service_config.uris, 
+            service_config.connect_timeout, 
+            service_config.read_timeout
+        )  # type: ignore
 
 
 class TransportAdapter(HTTPAdapter):
