@@ -118,12 +118,12 @@ class RequestsClient(object):
             session.verify = service_config.security.trust_store_path
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
-        return service_class(
+        return service_class(  # type: ignore
             session,
             service_config.uris,
             service_config.connect_timeout,
             service_config.read_timeout
-        )  # type: ignore
+        )
 
 
 class TransportAdapter(HTTPAdapter):
