@@ -20,8 +20,8 @@ from .._lib import (
     DictType,
     ListType,
     OptionalType,
-    SetType
-)
+    SetType,
+    BinaryType)
 from typing import Optional
 from typing import Dict, Any, List, FrozenSet
 import inspect
@@ -123,6 +123,11 @@ class ConjureDecoder(object):
         Returns:
             An instance of enum of type conjure_type.
         """
+        if not (isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"):
+            raise Exception(
+                'Expected to find str type but found {} instead'.format(
+                    type(obj)))
+
         if obj in conjure_type.__members__:
             return conjure_type[obj]
 
@@ -151,16 +156,17 @@ class ConjureDecoder(object):
         """
         if not isinstance(obj, dict):
             raise TypeError("expected a python dict")
+        if key_type == str or isinstance(key_type, BinaryType) \
+            or (inspect.isclass(key_type)
+                and issubclass(key_type, ConjureEnumType)):
+            return dict((
+                (cls.do_decode(x[0], key_type), cls.do_decode(x[1], item_type))
+                for x in obj.items()))
 
-        return dict(
-            map(
-                lambda x: (
-                    cls.do_decode(x[0], key_type),
-                    cls.do_decode(x[1], item_type),
-                ),
-                obj.items(),
-            )
-        )
+        return dict((
+            (cls.do_decode(json.loads(x[0]), key_type),
+             cls.do_decode(x[1], item_type))
+            for x in obj.items()))
 
     @classmethod
     def decode_list(cls, obj, element_type):
@@ -225,7 +231,7 @@ class ConjureDecoder(object):
 
         if object_type == float:
             return float(obj)
-        elif object_type == str:
+        elif object_type == str or isinstance(object_type, BinaryType):
             # Python 2/3 compatible way of checking string
             if not (isinstance(obj, str)
                     or str(type(obj)) == "<type 'unicode'>"):
