@@ -42,5 +42,6 @@ def test_enum_decode():
     decoded_unk = ConjureDecoder().read_from_string("\"G\"", TestEnum)
     assert repr(decoded_unk) == "TestEnum.UNKNOWN"
 
-    decoded_integer = ConjureDecoder().read_from_string("5", TestEnum)
-    assert repr(decoded_integer) == "TestEnum.UNKNOWN"
+    with pytest.raises(TypeError):
+        decoded_integer = ConjureDecoder().read_from_string("5", TestEnum)
+

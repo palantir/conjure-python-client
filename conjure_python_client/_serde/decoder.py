@@ -124,7 +124,7 @@ class ConjureDecoder(object):
             An instance of enum of type conjure_type.
         """
         if not (isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"):
-            raise Exception(
+            raise TypeError(
                 'Expected to find str type but found {} instead'.format(
                     type(obj)))
 
