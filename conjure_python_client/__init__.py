@@ -33,5 +33,6 @@ __all__ = [
     'RequestsClient',
     'Service',
     'ServiceConfiguration',
+    'SetType',
     'SslConfiguration',
 ]

@@ -20,9 +20,10 @@ from .._lib import (
     DictType,
     ListType,
     OptionalType,
+    SetType,
     BinaryType)
 from typing import Optional
-from typing import Dict, Any, List
+from typing import Dict, Any, List, FrozenSet
 import inspect
 import json
 
@@ -62,12 +63,14 @@ class ConjureDecoder(object):
             cls, obj, deserialized, python_arg_name, field_definition):
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
+        elif isinstance(field_definition.field_type, SetType):
+            deserialized[python_arg_name] = frozenset()
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
             deserialized[python_arg_name] = None
         else:
-            raise Exception(
+            raise ValueError(
                 "field {} not found in object {}".format(
                     field_definition.identifier, obj
                 )
@@ -99,7 +102,10 @@ class ConjureDecoder(object):
 
         deserialized = {}  # type: Dict[str, Any]
         if type_of_union not in obj or obj[type_of_union] is None:
-            cls.check_null_field(obj, deserialized, conjure_field_definition)
+            cls.check_null_field(obj,
+                                 deserialized,
+                                 attr,
+                                 conjure_field_definition)
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
@@ -118,7 +124,7 @@ class ConjureDecoder(object):
             An instance of enum of type conjure_type.
         """
         if not (isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"):
-            raise Exception(
+            raise TypeError(
                 'Expected to find str type but found {} instead'.format(
                     type(obj)))
 
@@ -149,7 +155,7 @@ class ConjureDecoder(object):
             and the values are of type value_type.
         """
         if not isinstance(obj, dict):
-            raise Exception("expected a python dict")
+            raise TypeError("expected a python dict")
         if key_type == str or isinstance(key_type, BinaryType) \
             or (inspect.isclass(key_type)
                 and issubclass(key_type, ConjureEnumType)):
@@ -176,9 +182,27 @@ class ConjureDecoder(object):
                 element_type.
         """
         if not isinstance(obj, list):
-            raise Exception("expected a python list")
+            raise TypeError("expected a python list")
 
         return list(map(lambda x: cls.do_decode(x, element_type), obj))
+
+    @classmethod
+    def decode_set(cls, obj, element_type):
+        # type: (List[Any], ConjureTypeType) -> FrozenSet[Any]
+        """Decodes json into a frozenset, handling conversion of the elements.
+
+        Args:
+            obj: the json object to decode
+            element_type: a class object which is the conjure type of
+                the elements in this list.
+        Returns:
+            A python frozenset where the elements are instances of type
+                element_type.
+        """
+        if not isinstance(obj, (list, set, frozenset)):
+            raise TypeError("expected a python list, set or frozenset")
+
+        return frozenset(map(lambda x: cls.do_decode(x, element_type), obj))
 
     @classmethod
     def decode_optional(cls, obj, object_type):
@@ -201,7 +225,7 @@ class ConjureDecoder(object):
     @classmethod
     def decode_primitive(cls, obj, object_type):
         def raise_mismatch():
-            raise Exception(
+            raise TypeError(
                 'Expected to find {} type but found {} instead'.format(
                     object_type, type(obj)))
 
@@ -249,6 +273,9 @@ class ConjureDecoder(object):
 
         elif isinstance(obj_type, OptionalType):
             return cls.decode_optional(obj, obj_type.item_type)
+
+        elif isinstance(obj_type, SetType):
+            return cls.decode_set(obj, obj_type.item_type)
 
         return cls.decode_primitive(obj, obj_type)
 

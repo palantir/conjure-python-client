@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Dict, Type, Any, Union
+from typing import List, Dict, Type, Any, Union, FrozenSet
 from enum import Enum
 
 from .case import to_snake_case
@@ -24,7 +24,8 @@ class ConjureType(object):
 
 
 DecodableType = Union[
-    int, float, bool, str, ConjureType, List[Any], Dict[Any, Any]
+    int, float, bool, str, ConjureType,
+    List[Any], Dict[Any, Any], FrozenSet[Any]
 ]
 
 
@@ -34,6 +35,18 @@ class ListType(ConjureType):
     def __init__(self, item_type):
         # type: (Type[DecodableType]) -> None
         self.item_type = item_type
+
+
+class SetType(ConjureType):
+    _item_type = None  # type: Type[DecodableType]
+
+    def __init__(self, item_type):
+        # type: (Type[DecodableType]) -> None
+        self._item_type = item_type
+
+    @property
+    def item_type(self):
+        return self._item_type
 
 
 class DictType(ConjureType):
@@ -78,6 +91,11 @@ class ConjureBeanType(ConjureType):
         name to the field definition"""
         return {}
 
+    def __hash__(self):
+        values_tuple = tuple(self._fields().values())
+        keys_tuple = tuple(self._fields().keys())
+        return hash((values_tuple, keys_tuple))
+
     def __eq__(self, other):
         # type: (Any) -> bool
         if not isinstance(other, self.__class__):
@@ -121,6 +139,12 @@ class ConjureUnionType(ConjureType):
         to the field definition for that type"""
         return {}
 
+    def __hash__(self):
+        values = tuple([getattr(self, attr) for
+                        attr, field_def in
+                        self._options().items()])
+        return hash(values)
+
     def __eq__(self, other):
         # type: (Any) -> bool
         if not isinstance(other, self.__class__):
@@ -129,9 +153,9 @@ class ConjureUnionType(ConjureType):
         assert isinstance(other, ConjureUnionType)
 
         pythonic_sanitized_identifier = \
-            sanitize_identifier(to_snake_case(self.type))
+            sanitize_identifier(to_snake_case(self._type))
 
-        return other.type == self.type and \
+        return other._type == self._type and \
             getattr(self, pythonic_sanitized_identifier) == \
             getattr(other, pythonic_sanitized_identifier)
 
