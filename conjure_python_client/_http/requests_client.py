@@ -100,7 +100,8 @@ class Service(object):
 
 class RetryWithJitter(Retry):
     def get_backoff_time(self):
-        return random.random() * super(RetryWithJitter, self).get_backoff_time()
+        jitter = random.random()
+        return jitter * super(RetryWithJitter, self).get_backoff_time()
 
 
 class RequestsClient(object):
