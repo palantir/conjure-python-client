@@ -98,6 +98,11 @@ class Service(object):
         )
 
 
+class RetryWithJitter(Retry):
+    def get_backoff_time(self):
+        return random.random() * super(RetryWithJitter, self).get_backoff_time()
+
+
 class RequestsClient(object):
 
     @classmethod
@@ -105,7 +110,7 @@ class RequestsClient(object):
         # type: (Type[T], str, ServiceConfiguration) -> T
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
-        retry = Retry(
+        retry = RetryWithJitter(
             total=service_config.max_num_retries,
             status_forcelist=[308, 429, 503],
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
