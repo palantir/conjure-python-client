@@ -29,5 +29,5 @@ class ServiceConfiguration(object):
     connect_timeout = 10  # type: float
     read_timeout = 300  # type: float
     uris = []  # type: List[str]
-    max_num_retries = 3  # type: int
-    backoff_slot_size = 500  # type: int
+    max_num_retries = 4  # type: int
+    backoff_slot_size = 250  # type: int
