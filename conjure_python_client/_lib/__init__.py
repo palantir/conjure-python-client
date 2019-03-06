@@ -27,5 +27,4 @@ __all__ = [
     'DictType',
     'ListType',
     'OptionalType',
-    'SetType'
 ]
