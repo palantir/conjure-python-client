@@ -24,7 +24,6 @@ def test_object_decodes_when_exact_fields_are_present():
         """{"fileSystemId": "foo", "path": "bar"}""", CreateDatasetRequest
     )
     assert decoded == CreateDatasetRequest("foo", "bar")
-    assert hash(decoded) is not None
 
 
 def test_object_with_extra_fields_should_only_keep_expected_fields():
@@ -33,31 +32,27 @@ def test_object_with_extra_fields_should_only_keep_expected_fields():
         CreateDatasetRequest,
     )
     assert decoded == CreateDatasetRequest("foo", "bar")
-    assert hash(decoded) is not None
 
 
 def test_object_with_list_field_decodes():
     decoded = ConjureDecoder().read_from_string('{"value": []}', ListExample)
     assert decoded == ListExample([])
-    assert hash(decoded) is not None
 
 
 def test_object_with_omitted_list_field_decodes():
     decoded = ConjureDecoder().read_from_string('{}', ListExample)
     assert decoded == ListExample([])
-    assert hash(decoded) is not None
 
 
 def test_object_with_map_field_decodes():
     decoded = ConjureDecoder().read_from_string('{"value": {}}', MapExample)
     assert decoded == MapExample({})
-    assert hash(decoded) is not None
 
 
 def test_object_with_omitted_map_field_decodes():
     decoded = ConjureDecoder().read_from_string('{}', MapExample)
     assert decoded == MapExample({})
-    assert hash(decoded) is not None
+
 
 def test_object_with_missing_field_should_throw_helpful_exception():
     with pytest.raises(Exception) as excinfo:
