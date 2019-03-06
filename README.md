@@ -10,7 +10,7 @@ conjure-typescript-client leverages [requests](http://docs.python-requests.org/e
 
 ## Contributing
 
-See the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
+See the [CONTRIBUTING.md](./CONTRIBUTING.md) document.  Releases are published to [pypi](https://pypi.org/project/conjure-python-client/) on tag builds and are automatically re-published to [conda](https://anaconda.org/conda-forge/conjure-python-client) using [conda-forge](https://github.com/conda-forge/conjure-python-client-feedstock/).
 
 ## License
 This project is made available under the [Apache 2.0 License](/LICENSE).
