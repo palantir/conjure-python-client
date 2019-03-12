@@ -134,3 +134,12 @@ class TestHttpRemoting(object):
         with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
         assert e.match("mocked http error. TraceId: 'faketraceid'. Response: ''")
+
+    @mock.patch('requests.Session.request')
+    def test_request_trace_id(self, mock_request):
+        mock_request.return_value = self._mock_response(json_data='bar')
+        self._test_service().testEndpoint('foo')
+
+        call = mock_request.mock_calls[0]
+        call_kwargs = call[2]
+        assert 'X-B3-TraceId' in call_kwargs['headers']
