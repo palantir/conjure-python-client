@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List, Optional, Dict
+from typing import TypeVar, Type, List, Optional, Dict, Final
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
@@ -41,6 +41,9 @@ CIPHERS = (
     "AES128-SHA:"
     "TLS_FALLBACK_SCSV"
 )
+
+
+TRACE_ID_HEADER = 'X-B3-TraceId' # type: Final[str]
 
 
 def fresh_trace_id():
@@ -89,7 +92,7 @@ class Service(object):
 
         if 'headers' not in kwargs:
             kwargs['headers'] = {}
-        kwargs['headers']['X-B3-TraceId'] = fresh_trace_id()
+        kwargs['headers'][TRACE_ID_HEADER] = fresh_trace_id()
 
         _response = self._requests_session.request(*args, **kwargs)
         try:
