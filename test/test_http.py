@@ -134,3 +134,21 @@ class TestHttpRemoting(object):
         with pytest.raises(ConjureHTTPError) as e:
             self._test_service().testEndpoint('foo')
         assert e.match("mocked http error. TraceId: 'faketraceid'. Response: ''")
+
+    @mock.patch('requests.Session.request')
+    def test_request_trace_id(self, mock_request):
+        mock_request.return_value = self._mock_response(json_data='bar')
+        self._test_service().testEndpoint('foo')
+
+        call = mock_request.mock_calls[0]
+        call_kwargs = call[2]
+        assert 'X-B3-TraceId' in call_kwargs['headers']
+        first_trace = call_kwargs['headers']['X-B3-TraceId']
+
+        mock_request.reset_mock()
+        self._test_service().testEndpoint('foo')
+
+        second_call = mock_request.mock_calls[0]
+        second_trace = second_call[2]['headers']['X-B3-TraceId']
+
+        assert first_trace != second_trace
