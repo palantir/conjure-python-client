@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List, Optional, Dict, Final
+from typing import TypeVar, Type, List, Optional, Dict
+from typing_extensions import Final
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
