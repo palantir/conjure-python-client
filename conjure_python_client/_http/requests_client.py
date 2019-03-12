@@ -43,6 +43,12 @@ CIPHERS = (
 )
 
 
+def fresh_trace_id():
+    # type: () -> str
+    # returns a string which is a valid zipkin trace id
+    return '{:02x}'.format(random.getrandbits(64))
+
+
 class Service(object):
     _requests_session = None  # type: requests.Session
     _uris = None  # type: List[str]
@@ -80,6 +86,10 @@ class Service(object):
                 kwargs[param_kind] = cleaned_params
 
         kwargs['timeout'] = (self._connect_timeout, self._read_timeout)
+
+        if 'headers' not in kwargs:
+            kwargs['headers'] = {}
+        kwargs['headers']['X-B3-TraceId'] = fresh_trace_id()
 
         _response = self._requests_session.request(*args, **kwargs)
         try:
