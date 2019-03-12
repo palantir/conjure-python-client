@@ -43,7 +43,7 @@ CIPHERS = (
 )
 
 
-TRACE_ID_HEADER = 'X-B3-TraceId' # type: str
+TRACE_ID_HEADER = 'X-B3-TraceId'  # type: str
 
 
 def fresh_trace_id():
