@@ -20,8 +20,10 @@ from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
 from future.utils import raise_from
+
+import binascii
+import os
 import requests
-import random
 
 
 T = TypeVar("T")
@@ -44,12 +46,13 @@ CIPHERS = (
 
 
 TRACE_ID_HEADER = 'X-B3-TraceId'  # type: str
+TRACE_ID_RANDOM_BYTES = 8
 
 
 def fresh_trace_id():
     # type: () -> str
     # returns a string which is a valid zipkin trace id
-    return '{:02x}'.format(random.getrandbits(64))
+    return binascii.hexlify(os.urandom(TRACE_ID_RANDOM_BYTES))
 
 
 class Service(object):
