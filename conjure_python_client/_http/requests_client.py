@@ -23,6 +23,7 @@ from future.utils import raise_from
 
 import binascii
 import os
+import random
 import requests
 
 
@@ -74,7 +75,7 @@ class Service(object):
     def _uri(self):
         # type: () -> str
         """returns a random uri"""
-        return random.choice(self._uris)
+        return random.SystemRandom().choice(self._uris)
 
     def _request(self, *args, **kwargs):
         # type (Any) -> Response
