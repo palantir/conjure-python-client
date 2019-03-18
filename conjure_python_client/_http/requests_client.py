@@ -51,8 +51,8 @@ TRACE_ID_RANDOM_BYTES = 8
 
 
 def fresh_trace_id():
-    # type: () -> str
-    # returns a string which is a valid zipkin trace id
+    # type: () -> bytes
+    # returns a bytestring which is a valid zipkin trace id
     return binascii.hexlify(os.urandom(TRACE_ID_RANDOM_BYTES))
 
 
