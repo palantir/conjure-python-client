@@ -118,7 +118,8 @@ class Service(object):
 class RetryWithJitter(Retry):
     '''
     Extends the standard urllib Retry in order to match conjure behaviour.
-    Retry times contain a uniform jitter. Additionally all http methods are considered valid to retry.
+    Retry times contain a uniform jitter. Additionally all http methods are
+    considered valid to retry.
     '''
 
     def _is_method_retryable(self, method):
