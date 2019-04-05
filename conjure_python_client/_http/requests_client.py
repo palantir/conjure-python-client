@@ -61,15 +61,17 @@ class Service(object):
     _uris = None  # type: List[str]
     _connect_timeout = None  # type: float
     _read_timeout = None  # type: float
+    _verify = None  # type: str
 
     def __init__(
-        self, requests_session, uris, _connect_timeout, _read_timeout
+        self, requests_session, uris, _connect_timeout, _read_timeout, _verify
     ):
-        # type: (requests.Session, List[str], float, float) -> None
+        # type: (requests.Session, List[str], float, float, str) -> None
         self._requests_session = requests_session
         self._uris = uris
         self._connect_timeout = _connect_timeout
         self._read_timeout = _read_timeout
+        self._verify = _verify
 
     @property
     def _uri(self):
@@ -82,22 +84,7 @@ class Service(object):
         """Make requests using configured :class:`requests.Session`.
         Any error details will be extracted to an :class:`HTTPError`
         which will contain relevant error details when printed."""
-        for param_kind in ['headers', 'params']:
-            if param_kind in kwargs:
-                cleaned_params = {}
-                for key, value in kwargs[param_kind].items():
-                    if value is None:
-                        continue
-                    cleaned_params[key] = str(value).lower() \
-                        if isinstance(value, bool) else str(value)
-                kwargs[param_kind] = cleaned_params
-
-        kwargs['timeout'] = (self._connect_timeout, self._read_timeout)
-
-        if 'headers' not in kwargs:
-            kwargs['headers'] = {}
-        kwargs['headers'][TRACE_ID_HEADER] = fresh_trace_id()
-
+        self._amend_request_kwargs(kwargs)
         _response = self._requests_session.request(*args, **kwargs)
         try:
             _response.raise_for_status()
@@ -113,6 +100,37 @@ class Service(object):
             "requests.Session(...)",
             repr(self._uris)
         )
+
+    def _amend_request_kwargs(self, kwargs):
+        for param_kind in ['headers', 'params']:
+            if param_kind in kwargs:
+                kwargs[param_kind] = _clean_params(kwargs[param_kind])
+        kwargs['timeout'] = (self._connect_timeout, self._read_timeout)
+        kwargs['verify'] = self._verify
+        _add_trace_id(kwargs)
+
+
+def _clean_params(params):
+    cleaned_params = {}
+    for key, value in params.items():
+        if value is None:
+            continue
+        cleaned_params[key] = _clean_param_value(value)
+    return cleaned_params
+
+
+def _clean_param_value(value):
+    if isinstance(value, bool):
+        return str(value).lower()
+    return str(value)
+
+
+def _add_trace_id(kwargs):
+    # type: (Dict) -> None
+    # Adds the trace ID to the arguments
+    if 'headers' not in kwargs:
+        kwargs['headers'] = {}
+    kwargs['headers'][TRACE_ID_HEADER] = fresh_trace_id()
 
 
 class RetryWithJitter(Retry):
@@ -147,14 +165,17 @@ class RequestsClient(object):
         session = requests.Session()
         session.headers = {"User-Agent": user_agent}
         if service_config.security is not None:
-            session.verify = service_config.security.trust_store_path
+            verify = service_config.security.trust_store_path
+        else:
+            verify = None
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
         return service_class(  # type: ignore
             session,
             service_config.uris,
             service_config.connect_timeout,
-            service_config.read_timeout
+            service_config.read_timeout,
+            verify,
         )
 
 
