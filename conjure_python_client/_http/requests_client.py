@@ -157,6 +157,7 @@ class RequestsClient(object):
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
         retry = RetryWithJitter(
             total=service_config.max_num_retries,
+            read=0, # do not retry read errors
             status_forcelist=[308, 429, 503],
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
         )
