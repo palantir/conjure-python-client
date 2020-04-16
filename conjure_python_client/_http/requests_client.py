@@ -29,20 +29,23 @@ import requests
 
 T = TypeVar("T")
 # https://testssl.sh/openssl-rfc.mappping.html
+# https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
 CIPHERS = (
-    "ECDHE-RSA-AES256-SHA384:"
-    "ECDHE-RSA-AES128-SHA256:"
-    "ECDH-RSA-AES256-SHA384:"
-    "ECDH-RSA-AES128-SHA256:"
-    "AES128-SHA256:"
-    "AES256-SHA256:"
-    "ECDHE-RSA-AES256-SHA:"
-    "ECDHE-RSA-AES128-SHA:"
-    "ECDH-RSA-AES256-SHA:"
-    "ECDH-RSA-AES128-SHA256:"
-    "AES256-SHA:"
-    "AES128-SHA:"
-    "TLS_FALLBACK_SCSV"
+    # tls 1.3 ciphers
+    # n.b. these may not actually be honoured given the comment in:
+    # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_ciphers
+    "TLS_AES_128_GCM_SHA256:"
+    "TLS_AES_256_GCM_SHA384:"
+    "TLS_CHACHA20_POLY1305_SHA256:"
+    # non-tls 1.3 ciphers
+    "ECDHE-ECDSA-AES128-GCM-SHA256:"
+    "ECDHE-RSA-AES128-GCM-SHA256:"
+    "ECDHE-ECDSA-AES256-GCM-SHA384:"
+    "ECDHE-RSA-AES256-GCM-SHA384:"
+    "ECDHE-ECDSA-CHACHA20-POLY1305:"
+    "ECDHE-RSA-CHACHA20-POLY1305:"
+    "DHE-RSA-AES128-GCM-SHA256:"
+    "DHE-RSA-AES256-GCM-SHA384"
 )
 
 
