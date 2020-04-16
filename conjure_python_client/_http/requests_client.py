@@ -32,7 +32,8 @@ T = TypeVar("T")
 # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
 CIPHERS = (
     # tls 1.3 ciphers
-    # n.b. this may not actually be honoured given https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_ciphers
+    # n.b. these may not actually be honoured given the comment in:
+    # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.set_ciphers
     "TLS_AES_128_GCM_SHA256:"
     "TLS_AES_256_GCM_SHA384:"
     "TLS_CHACHA20_POLY1305_SHA256:"
