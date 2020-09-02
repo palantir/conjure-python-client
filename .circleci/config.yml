@@ -36,7 +36,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+          command: pip install --user -U setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
           key: tox-v2-py27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
@@ -71,7 +71,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+          command: pip install --user -U setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
           key: tox-v2-py3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
@@ -103,7 +103,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+          command: pip install --user -U setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
           key: tox-v2-mypy27-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
@@ -135,7 +135,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+          command: pip install --user -U setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
           key: tox-v2-mypy3-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
@@ -167,7 +167,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: pip install --user setuptools tox==2.9.1 tox-virtualenv-no-download
+          command: pip install --user -U setuptools tox==2.9.1 tox-virtualenv-no-download
 
       - restore_cache:
           key: tox-v2-lint-{{ checksum "tox.ini" }}-({ checksum "Pipfile.lock" })
