@@ -51,8 +51,8 @@ class CreateDatasetRequest(ConjureBeanType):
 
 class SimpleService(Service):
 
-    def testEndpoint(self, string):
-        # type: (str) -> str
+    def testEndpoint(self, string, decoration=[]):
+        # type: (str, List[str]) -> str
 
         _headers = {
             'Accept': 'application/json',
@@ -60,6 +60,7 @@ class SimpleService(Service):
         } # type: Dict[str, Any]
 
         _params = {
+            "decoration": decoration
         } # type: Dict[str, Any]
 
         _path_params = {
