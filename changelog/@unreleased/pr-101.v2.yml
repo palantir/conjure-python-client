@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: List query parameters are now passed correctly
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/101

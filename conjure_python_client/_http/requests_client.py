@@ -123,6 +123,8 @@ def _clean_params(params):
 
 
 def _clean_param_value(value):
+    if isinstance(value, list):
+        return [_clean_param_value(element) for element in value]
     if isinstance(value, bool):
         return str(value).lower()
     return str(value)

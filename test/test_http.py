@@ -58,6 +58,13 @@ class TestHttpRemoting(object):
         self._test_service().testEndpoint('foo')
 
     @mock.patch('requests.Session.request')
+    def test_array_query_parameter(self, mock_request):
+        mock_request.return_value = self._mock_response(json_data='bar')
+        self._test_service().testEndpoint('foo', decoration=['branches', 'path'])
+        name, args, kwargs = mock_request.mock_calls[0]
+        assert kwargs["params"]["decoration"] == ['branches', 'path']
+
+    @mock.patch('requests.Session.request')
     def test_http_error(self, mock_request):
         resp = requests.Response()
         resp.status_code = 404
