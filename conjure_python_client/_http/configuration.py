@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Any
+from typing import List, Any, Optional
 
 
 class SslConfiguration(object):
@@ -31,3 +31,5 @@ class ServiceConfiguration(object):
     uris = []  # type: List[str]
     max_num_retries = 4  # type: int
     backoff_slot_size = 250  # type: int
+    "See https://requests.readthedocs.io/en/master/user/advanced/#proxies for details"
+    proxies = None # type: Optional[dict[str, str]]

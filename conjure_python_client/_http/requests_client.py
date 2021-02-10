@@ -170,6 +170,8 @@ class RequestsClient(object):
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()
         session.headers = {"User-Agent": user_agent}
+        if service_config.proxies is not None:
+            session.proxies = service_config.proxies
         if service_config.security is not None:
             verify = service_config.security.trust_store_path
         else:
