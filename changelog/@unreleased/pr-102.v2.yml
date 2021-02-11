@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Make it possible to specify proxy settings
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/102
