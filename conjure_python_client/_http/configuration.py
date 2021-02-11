@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict
 
 
 class SslConfiguration(object):
@@ -36,4 +36,4 @@ class ServiceConfiguration(object):
     uris = []  # type: List[str]
     max_num_retries = 4  # type: int
     backoff_slot_size = 250  # type: int
-    proxies = None  # type: Optional[dict[str, str]]
+    proxies = None  # type: Optional[Dict[str, str]]
