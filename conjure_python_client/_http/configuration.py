@@ -24,6 +24,11 @@ class SslConfiguration(object):
 
 
 class ServiceConfiguration(object):
+    """
+    For details regarding the proxies field,
+    please see https://requests.readthedocs.io/en/master/user/advanced/#proxies
+    If proxies is None, system defaults will be used, as described in the Requests docs
+    """
     api_token = None  # type: str
     security = SslConfiguration  # type: Any
     connect_timeout = 10  # type: float
@@ -31,5 +36,4 @@ class ServiceConfiguration(object):
     uris = []  # type: List[str]
     max_num_retries = 4  # type: int
     backoff_slot_size = 250  # type: int
-    "See https://requests.readthedocs.io/en/master/user/advanced/#proxies for details"
     proxies = None # type: Optional[dict[str, str]]
