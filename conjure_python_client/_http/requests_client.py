@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from warnings import warn
 
 from requests.adapters import HTTPAdapter
 from typing import TypeVar, Type, List, Optional, Dict
@@ -67,14 +68,15 @@ class Service(object):
     _verify = None  # type: str
 
     def __init__(
-        self, requests_session, uris, _connect_timeout, _read_timeout, _verify
+        self, requests_session, uris, _connect_timeout, _read_timeout, _verify, _deprecation_warnings
     ):
-        # type: (requests.Session, List[str], float, float, str) -> None
+        # type: (requests.Session, List[str], float, float, str, bool) -> None
         self._requests_session = requests_session
         self._uris = uris
         self._connect_timeout = _connect_timeout
         self._read_timeout = _read_timeout
         self._verify = _verify
+        self._deprecation_warnings = _deprecation_warnings
 
     @property
     def _uri(self):
@@ -95,6 +97,8 @@ class Service(object):
             if e.response is not None:
                 raise_from(ConjureHTTPError(e), e)
             raise e
+        if self._deprecation_warnings and _response.headers.get("deprecated") == "true":
+            warn("endpoint is deprecated", category=DeprecationWarning)
         return _response
 
     def __repr__(self):
@@ -182,6 +186,7 @@ class RequestsClient(object):
             service_config.connect_timeout,
             service_config.read_timeout,
             verify,
+            service_config.deprecation_warnings,
         )
 
 

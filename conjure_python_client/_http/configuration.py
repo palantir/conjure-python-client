@@ -31,3 +31,4 @@ class ServiceConfiguration(object):
     uris = []  # type: List[str]
     max_num_retries = 4  # type: int
     backoff_slot_size = 250  # type: int
+    deprecation_warnings = False  # type: bool
