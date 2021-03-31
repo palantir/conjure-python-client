@@ -20,7 +20,6 @@ from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
 from future.utils import raise_from
-from warnings import warn
 
 import binascii
 import functools
@@ -28,6 +27,7 @@ import os
 import random
 import requests
 import threading
+import warnings
 
 
 T = TypeVar("T")
@@ -67,11 +67,11 @@ _context = threading.local()
 
 def conjure_endpoint(func):
     @functools.wraps(func)
-    def _decorator(*args, **kwargs):
-        _context.service_name = func.__class__.__name__
+    def _decorator(self, *args, **kwargs):
+        _context.service_name = self.__class__.__name__
         _context.method_name = func.__name__
         try:
-            return func(*args, **kwargs)
+            return func(self, *args, **kwargs)
         finally:
             _context.service_name = None
             _context.method_name = None
@@ -161,7 +161,7 @@ def _add_trace_id(kwargs):
 def _deprecation_warning(r, *args, **kwargs):
     # type: (requests.Response, Any, Dict) -> None
     if r.headers.get("deprecated") == "true":
-        warn(
+        warnings.warn(
             "Using a deprecated endpoint."
             "Service: '{}'. Endpoint: '{}'. Method: '{}'"
             .format(
