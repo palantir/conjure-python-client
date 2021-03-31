@@ -18,12 +18,13 @@ import subprocess
 import sys
 
 try:
-    gitversion = subprocess.check_output(
-        'git describe --tags --always --first-parent'.split()
-    ).decode(
-    ).strip(
-    ).replace(
-        '-', '_'
+    gitversion = (
+        subprocess.check_output(
+            "git describe --tags --always --first-parent".split()
+        )
+        .decode()
+        .strip()
+        .replace("-", "_")
     )
     open("conjure_python_client/_version.py", "w").write(
         '__version__ = "{}"\n'.format(gitversion)
@@ -32,11 +33,12 @@ try:
         makedirs("build")
 except subprocess.CalledProcessError:
     print("outside git repo, not generating new version string")
-exec (open("conjure_python_client/_version.py").read())
+exec(open("conjure_python_client/_version.py").read())
 
 
 class FormatCommand(Command):
     """Enables setup.py format."""
+
     description = "Reformat python files using 'black'"
     user_options = [
         ("check", "c", "Don't write the files back, just return the status")

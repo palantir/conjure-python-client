@@ -13,18 +13,21 @@
 # limitations under the License.
 
 from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List, Optional, Dict
+from typing import TypeVar, Type, List, Optional, Dict, Any
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
 from future.utils import raise_from
+from warnings import warn
 
 import binascii
+import functools
 import os
 import random
 import requests
+import threading
 
 
 T = TypeVar("T")
@@ -59,6 +62,22 @@ def fresh_trace_id():
     return binascii.hexlify(os.urandom(TRACE_ID_RANDOM_BYTES))
 
 
+_context = threading.local()
+
+
+def conjure_endpoint(func):
+    @functools.wraps(func)
+    def _decorator(*args, **kwargs):
+        _context.service_name = func.__class__.__name__
+        _context.method_name = func.__name__
+        try:
+            return func(*args, **kwargs)
+        finally:
+            _context.service_name = None
+            _context.method_name = None
+    return _decorator
+
+
 class Service(object):
     _requests_session = None  # type: requests.Session
     _uris = None  # type: List[str]
@@ -75,6 +94,7 @@ class Service(object):
         self._connect_timeout = _connect_timeout
         self._read_timeout = _read_timeout
         self._verify = _verify
+        self._requests_session.hooks['response'].append(_deprecation_warning)
 
     @property
     def _uri(self):
@@ -136,6 +156,21 @@ def _add_trace_id(kwargs):
     if 'headers' not in kwargs:
         kwargs['headers'] = {}
     kwargs['headers'][TRACE_ID_HEADER] = fresh_trace_id()
+
+
+def _deprecation_warning(r, *args, **kwargs):
+    # type: (requests.Response, Any, Dict) -> None
+    if r.headers.get("deprecated") == "true":
+        warn(
+            "Using a deprecated endpoint."
+            "Service: '{}'. Endpoint: '{}'. Method: '{}'"
+            .format(
+                getattr(_context, 'service_name', 'unknown'),
+                getattr(_context, 'method_name', 'unknown'),
+                r.request.method,
+            ),
+            category=DeprecationWarning
+        )
 
 
 class RetryWithJitter(Retry):

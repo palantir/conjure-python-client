@@ -51,6 +51,7 @@ class CreateDatasetRequest(ConjureBeanType):
 
 class SimpleService(Service):
 
+    @conjure_endpoint
     def testEndpoint(self, string, decoration=[]):
         # type: (str, List[str]) -> str
 
