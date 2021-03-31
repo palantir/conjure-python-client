@@ -173,8 +173,8 @@ class TestHttpRemoting(object):
         m.register_uri(
             "POST",
             "https://dummy/simple/api/catalog/testEndpoint",
-            status_code=200,
-            headers={"deprecated": "true"}
+            headers={"deprecated": "true"},
+            json="bar",
         )
         with pytest.deprecated_call():
             self._test_service().testEndpoint(
