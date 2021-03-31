@@ -169,7 +169,9 @@ class TestHttpRemoting(object):
 
     @mock.patch("requests.Session.request")
     def test_deprecation_warning(self, mock_request):
-        mock_request.return_value = self._mock_response(json_data="bar", headers={"deprecated": "true"})
+        mock_request.return_value = self._mock_response(
+            json_data="bar", headers={"deprecated": "true"}
+        )
         with pytest.deprecated_call():
             self._test_service().testEndpoint(
                 "foo", decoration=["branches", "path"]

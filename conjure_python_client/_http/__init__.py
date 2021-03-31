@@ -13,9 +13,14 @@
 # limitations under the License.
 
 from .configuration import SslConfiguration, ServiceConfiguration
-from .requests_client import conjure_endpoint, RequestsClient, Service, ConjureHTTPError
+from .requests_client import conjure_endpoint, ConjureHTTPError, \
+    RequestsClient, Service
 
 __all__ = [
-    'SslConfiguration', 'ServiceConfiguration', 'RequestsClient', 'Service',
-    'ConjureHTTPError', 'conjure_endpoint'
+    'conjure_endpoint',
+    'ConjureHTTPError',
+    'RequestsClient',
+    'Service',
+    'ServiceConfiguration',
+    'SslConfiguration',
 ]

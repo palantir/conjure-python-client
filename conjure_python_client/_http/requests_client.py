@@ -160,6 +160,7 @@ def _add_trace_id(kwargs):
 
 def _deprecation_warning(r, *args, **kwargs):
     # type: (requests.Response, Any, Dict) -> None
+    raise ValueError("called deprecation hook")
     if r.headers.get("deprecated") == "true":
         warn(
             "Using a deprecated endpoint."
