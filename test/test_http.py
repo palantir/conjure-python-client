@@ -171,7 +171,7 @@ class TestHttpRemoting(object):
     @requests_mock.Mocker()
     def test_deprecation_warning(self, m):
         m.register_uri(
-            "GET",
+            "POST",
             "https://dummy/simple/api/catalog/testEndpoint",
             json="bar",
             headers={"deprecated": "true"}
