@@ -172,7 +172,6 @@ class TestHttpRemoting(object):
         mock_request.return_value = self._mock_response(
             json_data="bar", headers={"deprecated": "true"}
         )
-        with pytest.deprecated_call():
-            self._test_service().testEndpoint(
-                "foo", decoration=["branches", "path"]
-            )
+        self._test_service().testEndpoint(
+            "foo", decoration=["branches", "path"]
+        )
