@@ -87,6 +87,6 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=["enum34", "future", "requests", "typing"],
-    tests_require=["pytest", "pyyaml"],
+    tests_require=["pytest", "pyyaml", "requests-mock"],
     cmdclass={"format": FormatCommand},
 )

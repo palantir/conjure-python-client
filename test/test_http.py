@@ -20,6 +20,7 @@ from conjure_python_client import (
 import mock
 import pytest
 import requests
+import requests_mock
 from requests.exceptions import HTTPError
 from test.example_service.product import SimpleService
 
@@ -167,11 +168,15 @@ class TestHttpRemoting(object):
 
         assert first_trace != second_trace
 
-    @mock.patch("requests.Session.request")
-    def test_deprecation_warning(self, mock_request):
-        mock_request.return_value = self._mock_response(
-            json_data="bar", headers={"deprecated": "true"}
+    @requests_mock.Mocker()
+    def test_deprecation_warning(self, m: requests_mock.Mocker):
+        m.register_uri(
+            "GET",
+            "https://dummy/simple/api/catalog/testEndpoint",
+            json="bar",
+            headers={"deprecated": "true"}
         )
-        self._test_service().testEndpoint(
-            "foo", decoration=["branches", "path"]
-        )
+        with pytest.deprecated_call():
+            self._test_service().testEndpoint(
+                "foo", decoration=["branches", "path"]
+            )
