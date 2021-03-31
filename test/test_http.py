@@ -169,7 +169,7 @@ class TestHttpRemoting(object):
         assert first_trace != second_trace
 
     @requests_mock.Mocker()
-    def test_deprecation_warning(self, m: requests_mock.Mocker):
+    def test_deprecation_warning(self, m):
         m.register_uri(
             "GET",
             "https://dummy/simple/api/catalog/testEndpoint",
