@@ -160,8 +160,8 @@ def _add_trace_id(kwargs):
 
 def _deprecation_warning(r, *args, **kwargs):
     # type: (requests.Response, Any, Dict) -> None
-    raise ValueError("called deprecation hook")
     if r.headers.get("deprecated") == "true":
+        raise ValueError("called deprecation hook")
         warn(
             "Using a deprecated endpoint."
             "Service: '{}'. Endpoint: '{}'. Method: '{}'"
@@ -172,6 +172,8 @@ def _deprecation_warning(r, *args, **kwargs):
             ),
             category=DeprecationWarning
         )
+    else:
+        raise ValueError(r.headers.get("deprecated"))
 
 
 class RetryWithJitter(Retry):
