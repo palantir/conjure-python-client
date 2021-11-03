@@ -14,7 +14,7 @@
 
 from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType, BinaryType
 from math import isnan, isinf
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, List
 import json
 import base64
 
@@ -91,15 +91,20 @@ class ConjureEncoder(json.JSONEncoder):
         return self.do_encode(obj)
 
     def plain(self, obj):
-        # type: (Any) -> Union[list[str], str]
+        # type: (Any) -> Union[List[str], str]
         """PLAIN-encode object for use in header / path / query params"""
         if isinstance(obj, ConjureBeanType) or isinstance(obj, ConjureUnionType) or isinstance(obj, dict):
             raise ValueError("Cannot PLAIN-encode complex types")
 
         # lists and sets are ok in query params; the client formats it into &param=...&param=...
         if isinstance(obj, list) or isinstance(obj, set):
-            return [self.plain(inner) for inner in obj]
+            return [self.plain_primitive(inner) for inner in obj]
 
+        return self.plain_primitive(obj)
+
+
+    def plain_primitive(self, obj):
+        # type: (Any) -> str
         # strings in their unquoted form (client does URL-encoding)
         # this covers bearertoken / rid / uuid / datetime / string
         if isinstance(obj, str):
@@ -117,15 +122,17 @@ class ConjureEncoder(json.JSONEncoder):
                 return '{}Infinity'.format('-' if obj < 0 else '')
             return str(obj)
 
+        # bool as lowercase bool
+        # NB: bools are ints so this test has to be first
+        if isinstance(obj, bool):
+            return str(obj).lower()
+
         # ints (and safelong) as just the number
         if isinstance(obj, int):
             return str(obj)
-
-        if isinstance(obj, bool):
-            return str(obj).lower()
 
         # unquoted variant name
         if isinstance(obj, ConjureEnumType):
             return obj.value
 
-        return ValueError("Cannot PLAIN-encode type: " + type(obj))
+        raise ValueError("Cannot PLAIN-encode type: " + type(obj))
