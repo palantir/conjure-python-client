@@ -14,7 +14,7 @@
 
 from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType, BinaryType
 from math import isnan, isinf
-from typing import Dict, Any
+from typing import Dict, Any, Union
 import json
 import base64
 
@@ -91,8 +91,8 @@ class ConjureEncoder(json.JSONEncoder):
         return self.do_encode(obj)
 
     def plain(self, obj):
+        # type: (Any) -> Union[list[str], str]
         """PLAIN-encode object for use in header / path / query params"""
-        # type: (Any) -> str
         if isinstance(obj, ConjureBeanType) or isinstance(obj, ConjureUnionType) or isinstance(obj, dict):
             raise ValueError("Cannot PLAIN-encode complex types")
 
@@ -107,7 +107,7 @@ class ConjureEncoder(json.JSONEncoder):
 
         # binary as base64 encoded string
         if isinstance(obj, bytes):
-            return base64.b64encode(obj)
+            return base64.b64encode(obj).decode('ascii')
 
         # floats as the number value or special NaN / Infinity values
         if isinstance(obj, float):

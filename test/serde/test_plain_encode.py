@@ -13,5 +13,5 @@ from test.generated.conjure_verification_types import EnumExample
     ([1, "test", EnumExample.ONE], ["1", "test", "ONE"])
 ])
 def test_plain_encodes(value, expected_encoded):
-    encoded = ConjureEncoder.plain(value)
+    encoded = ConjureEncoder().plain(value)
     assert(encoded == expected_encoded)
