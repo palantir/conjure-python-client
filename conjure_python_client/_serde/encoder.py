@@ -98,7 +98,7 @@ class ConjureEncoder(json.JSONEncoder):
                 or isinstance(obj, dict):
             raise ValueError("Cannot PLAIN-encode complex types")
 
-        # lists and sets are ok in query params; the client formats it into &param=...&param=...
+        # lists and sets are ok in query params (&param=...&param=...)
         if isinstance(obj, list) or isinstance(obj, set):
             return [self.plain_primitive(inner) for inner in obj]
 
