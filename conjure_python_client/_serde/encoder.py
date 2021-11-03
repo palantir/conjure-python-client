@@ -112,8 +112,9 @@ class ConjureEncoder(json.JSONEncoder):
             return obj
 
         # binary as base64 encoded string
+        # on py2 we can never detect binary
         if isinstance(obj, bytes):
-            return base64.b64encode(obj).decode('ascii')
+            return base64.b64encode(obj).decode('ascii')  # type: ignore
 
         # floats as the number value or special NaN / Infinity values
         if isinstance(obj, float):
@@ -136,4 +137,4 @@ class ConjureEncoder(json.JSONEncoder):
         if isinstance(obj, ConjureEnumType):
             return obj.value
 
-        raise ValueError("Cannot PLAIN-encode type: " + type(obj))
+        raise ValueError("Cannot PLAIN-encode type: " + str(type(obj)))
