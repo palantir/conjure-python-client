@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType
+from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType, BinaryType
 from math import isnan, isinf
 from typing import Dict, Any
 import json
+import base64
 
 
 class ConjureEncoder(json.JSONEncoder):
@@ -88,3 +89,43 @@ class ConjureEncoder(json.JSONEncoder):
     def default(self, obj):
         # type: (Any) -> Any
         return self.do_encode(obj)
+
+    def plain(self, obj):
+        """PLAIN-encode object for use in header / path / query params"""
+        # type: (Any) -> str
+        if isinstance(obj, ConjureBeanType) or isinstance(obj, ConjureUnionType) or isinstance(obj, dict):
+            raise ValueError("Cannot PLAIN-encode complex types")
+
+        # lists and sets are ok in query params; the client formats it into &param=...&param=...
+        if isinstance(obj, list) or isinstance(obj, set):
+            return [self.plain(inner) for inner in obj]
+
+        # strings in their unquoted form (client does URL-encoding)
+        # this covers bearertoken / rid / uuid / datetime / string
+        if isinstance(obj, str):
+            return obj
+
+        # binary as base64 encoded string
+        if isinstance(obj, bytes):
+            return base64.b64encode(obj)
+
+        # floats as the number value or special NaN / Infinity values
+        if isinstance(obj, float):
+            if isnan(obj):
+                return 'NaN'
+            if isinf(obj):
+                return '{}Infinity'.format('-' if obj < 0 else '')
+            return str(obj)
+
+        # ints (and safelong) as just the number
+        if isinstance(obj, int):
+            return str(obj)
+
+        if isinstance(obj, bool):
+            return str(obj).lower()
+
+        # unquoted variant name
+        if isinstance(obj, ConjureEnumType):
+            return obj.value
+
+        return ValueError("Cannot PLAIN-encode type: " + type(obj))
