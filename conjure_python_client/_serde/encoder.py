@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType, BinaryType
+from .._lib import ConjureBeanType, ConjureUnionType, ConjureEnumType
 from math import isnan, isinf
 from typing import Dict, Any, Union, List
 import json
@@ -93,7 +93,9 @@ class ConjureEncoder(json.JSONEncoder):
     def plain(self, obj):
         # type: (Any) -> Union[List[str], str]
         """PLAIN-encode object for use in header / path / query params"""
-        if isinstance(obj, ConjureBeanType) or isinstance(obj, ConjureUnionType) or isinstance(obj, dict):
+        if isinstance(obj, ConjureBeanType) \
+                or isinstance(obj, ConjureUnionType) \
+                or isinstance(obj, dict):
             raise ValueError("Cannot PLAIN-encode complex types")
 
         # lists and sets are ok in query params; the client formats it into &param=...&param=...
@@ -101,7 +103,6 @@ class ConjureEncoder(json.JSONEncoder):
             return [self.plain_primitive(inner) for inner in obj]
 
         return self.plain_primitive(obj)
-
 
     def plain_primitive(self, obj):
         # type: (Any) -> str
