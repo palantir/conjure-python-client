@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Add `ConjureEncoder.plain` for use in header/query/path parameters
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/108
