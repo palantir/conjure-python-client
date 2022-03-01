@@ -14,6 +14,7 @@ mkdir -p "$DOWNLOADS_DIR"/bin
 mkdir -p "$RESOURCES_DIR"
 
 function download() {
+  echo "Downloading $1"
   basename=$(basename "$1")
   target="$DOWNLOADS_DIR"/"$basename"
   if [[ ! -f "$target" ]]; then
