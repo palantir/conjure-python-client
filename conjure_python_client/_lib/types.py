@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Dict, Type, Any, Union
 from enum import Enum
+from typing import List, Dict, Type, Any, Union
 
 from .case import to_snake_case
 from .sanitize import sanitize_identifier
@@ -28,6 +28,15 @@ DecodableType = Union[
 ]
 
 
+class ConjureFieldDefinition:
+    identifier: str
+    field_type: Type[DecodableType]
+
+    def __init__(self, identifier: str, field_type: Type[DecodableType]) -> None:
+        self.identifier = identifier
+        self.field_type = field_type
+
+
 class ListType(ConjureType):
     item_type: Type[DecodableType]
 
@@ -40,7 +49,7 @@ class DictType(ConjureType):
     value_type: Type[DecodableType]
 
     def __init__(
-        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+            self, key_type: Type[DecodableType], value_type: Type[DecodableType]
     ) -> None:
         self.key_type = key_type
         self.value_type = value_type
@@ -70,7 +79,7 @@ class ConjureEnumType(ConjureType, Enum):
 
 class ConjureBeanType(ConjureType):
     @classmethod
-    def _fields(cls) -> Dict[str, "ConjureFieldDefinition"]:
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         """_fields is a mapping from constructor argument
         name to the field definition"""
         return {}
@@ -96,9 +105,6 @@ class ConjureBeanType(ConjureType):
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
 
 
-ConjureTypeType = Union[ConjureType, Type[DecodableType]]
-
-
 class ConjureUnionType(ConjureType):
     _type: str
 
@@ -108,7 +114,7 @@ class ConjureUnionType(ConjureType):
         return self._type
 
     @classmethod
-    def _options(cls) -> Dict[str, "ConjureFieldDefinition"]:
+    def _options(cls) -> Dict[str, ConjureFieldDefinition]:
         """_options defines a mapping from each member in the union
         to the field definition for that type"""
         return {}
@@ -137,12 +143,3 @@ class ConjureUnionType(ConjureType):
             if getattr(self, attr) is not None
         ]
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
-
-
-class ConjureFieldDefinition:
-    identifier: str
-    field_type: ConjureTypeType
-
-    def __init__(self, identifier: str, field_type: ConjureTypeType) -> None:
-        self.identifier = identifier
-        self.field_type = field_type
