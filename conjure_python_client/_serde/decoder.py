@@ -106,7 +106,8 @@ class ConjureDecoder(object):
         deserialized: Dict[str, Any] = {}
         if type_of_union not in obj or obj[type_of_union] is None:
             cls.check_null_field(
-                    obj, deserialized, attribute, conjure_field_definition)
+                obj, deserialized, attribute, conjure_field_definition
+            )
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type

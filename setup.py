@@ -66,10 +66,10 @@ class FormatCommand(Command):
             pass
 
     def black(self):
-        return system("black --line-length 79 *.py **/*.py")
+        return system("black --line-length 79 .")
 
     def blackCheck(self):
-        return system("black --check --quiet --line-length 79 *.py **/*.py")
+        return system("black --check --quiet --line-length 79 .")
 
 
 setup(

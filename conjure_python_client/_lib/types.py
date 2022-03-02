@@ -70,7 +70,7 @@ class ConjureEnumType(ConjureType, Enum):
 
 class ConjureBeanType(ConjureType):
     @classmethod
-    def _fields(cls) -> Dict[str, 'ConjureFieldDefinition']:
+    def _fields(cls) -> Dict[str, "ConjureFieldDefinition"]:
         """_fields is a mapping from constructor argument
         name to the field definition"""
         return {}
@@ -108,7 +108,7 @@ class ConjureUnionType(ConjureType):
         return self._type
 
     @classmethod
-    def _options(cls) -> Dict[str, 'ConjureFieldDefinition']:
+    def _options(cls) -> Dict[str, "ConjureFieldDefinition"]:
         """_options defines a mapping from each member in the union
         to the field definition for that type"""
         return {}
