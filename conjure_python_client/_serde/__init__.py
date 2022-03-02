@@ -17,6 +17,6 @@ from .encoder import ConjureEncoder
 
 
 __all__ = [
-    'ConjureDecoder',
-    'ConjureEncoder',
+    "ConjureDecoder",
+    "ConjureEncoder",
 ]

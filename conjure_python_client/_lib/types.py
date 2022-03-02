@@ -29,28 +29,27 @@ DecodableType = Union[
 
 
 class ListType(ConjureType):
-    item_type = None  # type: Type[DecodableType]
+    item_type: Type[DecodableType]
 
-    def __init__(self, item_type):
-        # type: (Type[DecodableType]) -> None
+    def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
 
 
 class DictType(ConjureType):
-    key_type = None  # type: Type[DecodableType]
-    value_type = None  # type: Type[DecodableType]
+    key_type: Type[DecodableType]
+    value_type: Type[DecodableType]
 
-    def __init__(self, key_type, value_type):
-        # type: (Type[DecodableType], Type[DecodableType]) -> None
+    def __init__(
+        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+    ) -> None:
         self.key_type = key_type
         self.value_type = value_type
 
 
 class OptionalType(ConjureType):
-    item_type = None  # type: Type[DecodableType]
+    item_type: Type[DecodableType]
 
-    def __init__(self, item_type):
-        # type: (Type[DecodableType]) -> None
+    def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
 
 
@@ -70,16 +69,13 @@ class ConjureEnumType(ConjureType, Enum):
 
 
 class ConjureBeanType(ConjureType):
-
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
+    def _fields(cls) -> Dict[str, "ConjureFieldDefinition"]:
         """_fields is a mapping from constructor argument
         name to the field definition"""
         return {}
 
-    def __eq__(self, other):
-        # type: (Any) -> bool
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
@@ -89,12 +85,10 @@ class ConjureBeanType(ConjureType):
 
         return True
 
-    def __ne__(self, other):
-        # type: (Any) -> bool
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    def __repr__(self):
-        # type: () -> str
+    def __repr__(self) -> str:
         fields = [
             "{}={}".format(attr, repr(getattr(self, attr)))
             for attr, field_def in self._fields().items()
@@ -106,41 +100,37 @@ ConjureTypeType = Union[ConjureType, Type[DecodableType]]
 
 
 class ConjureUnionType(ConjureType):
-    _type = None  # type: str
+    _type: str
 
     @property
-    def type(self):
-        # type: () -> str
+    def type(self) -> str:
         """the member name present in this union"""
         return self._type
 
     @classmethod
-    def _options(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
+    def _options(cls) -> Dict[str, "ConjureFieldDefinition"]:
         """_options defines a mapping from each member in the union
         to the field definition for that type"""
         return {}
 
-    def __eq__(self, other):
-        # type: (Any) -> bool
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
         assert isinstance(other, ConjureUnionType)
 
-        pythonic_sanitized_identifier = \
-            sanitize_identifier(to_snake_case(self.type))
+        pythonic_sanitized_identifier = sanitize_identifier(
+            to_snake_case(self.type)
+        )
 
-        return other.type == self.type and \
-            getattr(self, pythonic_sanitized_identifier) == \
-            getattr(other, pythonic_sanitized_identifier)
+        return other.type == self.type and getattr(
+            self, pythonic_sanitized_identifier
+        ) == getattr(other, pythonic_sanitized_identifier)
 
-    def __ne__(self, other):
-        # type: (Any) -> bool
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    def __repr__(self):
-        # type: () -> str
+    def __repr__(self) -> str:
         fields = [
             "{}={}".format(attr, repr(getattr(self, attr)))
             for attr, field_def in self._options().items()
@@ -149,11 +139,10 @@ class ConjureUnionType(ConjureType):
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
 
 
-class ConjureFieldDefinition(object):
-    identifier = None  # type: str
-    field_type = None  # type: ConjureTypeType
+class ConjureFieldDefinition:
+    identifier: str
+    field_type: ConjureTypeType
 
-    def __init__(self, identifier, field_type):
-        # type: (str, ConjureTypeType) -> None
+    def __init__(self, identifier: str, field_type: ConjureTypeType) -> None:
         self.identifier = identifier
         self.field_type = field_type

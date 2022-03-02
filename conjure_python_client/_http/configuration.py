@@ -11,23 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from typing import List, Any
-
-
-class SslConfiguration(object):
-    trust_store_path = None  # type: str
-
-    def __init__(self, trust_store_path):
-        # type: (str) -> None
-        self.trust_store_path = trust_store_path
+from dataclasses import dataclass, field
+from typing import List, Optional
 
 
-class ServiceConfiguration(object):
-    api_token = None  # type: str
-    security = SslConfiguration  # type: Any
-    connect_timeout = 10  # type: float
-    read_timeout = 300  # type: float
-    uris = []  # type: List[str]
-    max_num_retries = 4  # type: int
-    backoff_slot_size = 250  # type: int
+@dataclass
+class SslConfiguration:
+    trust_store_path: str
+
+
+@dataclass
+class ServiceConfiguration:
+    api_token: Optional[str] = None
+    security: Optional[SslConfiguration] = None
+    uris: List[str] = field(default_factory=list)
+    connect_timeout: float = 10
+    read_timeout: float = 300
+    max_num_retries: int = 4
+    backoff_slot_size: int = 250

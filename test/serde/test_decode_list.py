@@ -44,5 +44,4 @@ def test_list_does_not_decode_from_json_null():
 
 def test_list_does_not_decode_from_json_string():
     with pytest.raises(Exception):
-        ConjureDecoder().read_from_string("\"hello\"", ListType(int))
-
+        ConjureDecoder().read_from_string('"hello"', ListType(int))

@@ -20,63 +20,55 @@ from typing import Optional
 from typing import Set
 from typing import Tuple
 
-class CreateDatasetRequest(ConjureBeanType):
 
+class CreateDatasetRequest(ConjureBeanType):
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         return {
-            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
-            'path': ConjureFieldDefinition('path', str)
+            "file_system_id": ConjureFieldDefinition("fileSystemId", str),
+            "path": ConjureFieldDefinition("path", str),
         }
 
-    _file_system_id = None # type: str
-    _path = None # type: str
+    _file_system_id: str = None
+    _path: str = None
 
-    def __init__(self, file_system_id, path):
-        # type: (str, str) -> None
+    def __init__(self, file_system_id: str, path: str) -> None:
         self._file_system_id = file_system_id
         self._path = path
 
     @property
-    def file_system_id(self):
-        # type: () -> str
+    def file_system_id(self) -> str:
         return self._file_system_id
 
     @property
-    def path(self):
-        # type: () -> str
+    def path(self) -> str:
         return self._path
 
 
 class SimpleService(Service):
+    def testEndpoint(self, string: str, decoration: List[str] = []) -> str:
 
-    def testEndpoint(self, string, decoration=[]):
-        # type: (str, List[str]) -> str
+        _headers: Dict[str, Any] = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
 
-        _headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        } # type: Dict[str, Any]
+        _params: Dict[str, Any] = {"decoration": decoration}
 
-        _params = {
-            "decoration": decoration
-        } # type: Dict[str, Any]
+        _path_params: Dict[str, Any] = {}
 
-        _path_params = {
-        } # type: Dict[str, Any]
+        _json: Any = ConjureEncoder().default(string)
 
-        _json = ConjureEncoder().default(string) # type: Any
-
-        _path = '/catalog/testEndpoint'
+        _path = "/catalog/testEndpoint"
         _path = _path.format(**_path_params)
 
-        _response = self._request( # type: ignore
-            'POST',
+        _response = self._request(
+            "POST",
             self._uri + _path,
             params=_params,
             headers=_headers,
-            json=_json)
+            json=_json,
+        )
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), str)

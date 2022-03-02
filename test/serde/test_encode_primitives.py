@@ -18,19 +18,21 @@ from conjure_python_client import ConjureEncoder
 
 def test_float_encodes():
     encoded = ConjureEncoder.encode_primitive(1.0)
-    assert(type(encoded) is float)
+    assert type(encoded) is float
 
 
 def test_nan_float_encodes():
-    encoded = ConjureEncoder.encode_primitive(float('nan'))
-    assert(encoded == 'NaN')
+    encoded = ConjureEncoder.encode_primitive(float("nan"))
+    assert encoded == "NaN"
 
 
-@pytest.mark.parametrize("value,expected_encoded", [
-    (float('inf'), 'Infinity'),
-    (-float('inf'), '-Infinity'),
-])
+@pytest.mark.parametrize(
+    "value,expected_encoded",
+    [
+        (float("inf"), "Infinity"),
+        (-float("inf"), "-Infinity"),
+    ],
+)
 def test_inf_float_encodes(value, expected_encoded):
     encoded = ConjureEncoder.encode_primitive(value)
-    assert(encoded == expected_encoded)
-
+    assert encoded == expected_encoded

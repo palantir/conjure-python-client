@@ -15,10 +15,14 @@
 import pytest
 from conjure_python_client._lib.case import to_snake_case
 
-@pytest.mark.parametrize('name,expected_snake_case', [
-    ('value', 'value'),
-    ('testValue', 'test_value'),
-    ('test_value', 'test_value'),
-])
-def test_casing(name,expected_snake_case):
+
+@pytest.mark.parametrize(
+    "name,expected_snake_case",
+    [
+        ("value", "value"),
+        ("testValue", "test_value"),
+        ("test_value", "test_value"),
+    ],
+)
+def test_casing(name, expected_snake_case):
     assert to_snake_case(name) == expected_snake_case

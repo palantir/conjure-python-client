@@ -16,15 +16,15 @@ from .types import *
 
 
 __all__ = [
-    'BinaryType',
-    'ConjureBeanType',
-    'ConjureEnumType',
-    'ConjureFieldDefinition',
-    'ConjureType',
-    'ConjureTypeType',
-    'ConjureUnionType',
-    'DecodableType',
-    'DictType',
-    'ListType',
-    'OptionalType',
+    "BinaryType",
+    "ConjureBeanType",
+    "ConjureEnumType",
+    "ConjureFieldDefinition",
+    "ConjureType",
+    "ConjureTypeType",
+    "ConjureUnionType",
+    "DecodableType",
+    "DictType",
+    "ListType",
+    "OptionalType",
 ]

@@ -20,111 +20,93 @@ from typing import Optional
 from typing import Set
 from typing import Tuple
 
-class BackingFileSystem(ConjureBeanType):
 
+class BackingFileSystem(ConjureBeanType):
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         return {
-            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
-            'base_uri': ConjureFieldDefinition('baseUri', str),
-            'configuration': ConjureFieldDefinition('configuration', DictType(str, str))
+            "file_system_id": ConjureFieldDefinition("fileSystemId", str),
+            "base_uri": ConjureFieldDefinition("baseUri", str),
+            "configuration": ConjureFieldDefinition(
+                "configuration", DictType(str, str)
+            ),
         }
 
-    _file_system_id = None # type: str
-    _base_uri = None # type: str
-    _configuration = None # type: Dict[str, str]
+    _file_system_id: str = None
+    _base_uri: str = None
+    _configuration: Dict[str, str] = None
 
-    def __init__(self, file_system_id, base_uri, configuration):
-        # type: (str, str, Dict[str, str]) -> None
+    def __init__(
+        self, file_system_id: str, base_uri: str, configuration: Dict[str, str]
+    ) -> None:
         self._file_system_id = file_system_id
         self._base_uri = base_uri
         self._configuration = configuration
 
     @property
-    def file_system_id(self):
-        # type: () -> str
-        '''The name by which this file system is identified.'''
+    def file_system_id(self) -> str:
+        """The name by which this file system is identified."""
         return self._file_system_id
 
     @property
-    def base_uri(self):
-        # type: () -> str
+    def base_uri(self) -> str:
         return self._base_uri
 
     @property
-    def configuration(self):
-        # type: () -> Dict[str, str]
+    def configuration(self) -> Dict[str, str]:
         return self._configuration
 
-class Dataset(ConjureBeanType):
 
+class Dataset(ConjureBeanType):
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         return {
-            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
-            'rid': ConjureFieldDefinition('rid', str)
+            "file_system_id": ConjureFieldDefinition("fileSystemId", str),
+            "rid": ConjureFieldDefinition("rid", str),
         }
 
-    _file_system_id = None # type: str
-    _rid = None # type: str
+    _file_system_id: str = None
+    _rid: str = None
 
-    def __init__(self, file_system_id, rid):
-        # type: (str, str) -> None
+    def __init__(self, file_system_id: str, rid: str) -> None:
         self._file_system_id = file_system_id
         self._rid = rid
 
     @property
-    def file_system_id(self):
-        # type: () -> str
+    def file_system_id(self) -> str:
         return self._file_system_id
 
     @property
-    def rid(self):
-        # type: () -> str
-        '''Uniquely identifies this dataset.'''
+    def rid(self) -> str:
+        """Uniquely identifies this dataset."""
         return self._rid
 
 
 class ListExample(ConjureBeanType):
-
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            'value': ConjureFieldDefinition('value', ListType(str))
-        }
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+        return {"value": ConjureFieldDefinition("value", ListType(str))}
 
-    _value = None # type: List[str]
+    _value: List[str] = None
 
-    def __init__(self, value):
-        # type: (List[str]) -> None
+    def __init__(self, value: List[str]) -> None:
         self._value = value
 
     @property
-    def value(self):
-        # type: () -> List[str]
+    def value(self) -> List[str]:
         return self._value
 
 
 class MapExample(ConjureBeanType):
-
     @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            'value': ConjureFieldDefinition('value', DictType(str, str))
-        }
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+        return {"value": ConjureFieldDefinition("value", DictType(str, str))}
 
-    _value = None # type: Dict[str, str]
+    _value: Dict[str, str] = None
 
-    def __init__(self, value):
-        # type: (Dict[str, str]) -> None
+    def __init__(self, value: Dict[str, str]) -> None:
         self._value = value
 
     @property
-    def value(self):
-        # type: () -> Dict[str, str]
+    def value(self) -> Dict[str, str]:
         return self._value
-

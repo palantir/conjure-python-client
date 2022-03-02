@@ -18,12 +18,13 @@ import subprocess
 import sys
 
 try:
-    gitversion = subprocess.check_output(
-        'git describe --tags --always --first-parent'.split()
-    ).decode(
-    ).strip(
-    ).replace(
-        '-', '_'
+    gitversion = (
+        subprocess.check_output(
+            "git describe --tags --always --first-parent".split()
+        )
+        .decode()
+        .strip()
+        .replace("-", "_")
     )
     open("conjure_python_client/_version.py", "w").write(
         '__version__ = "{}"\n'.format(gitversion)
@@ -32,11 +33,12 @@ try:
         makedirs("build")
 except subprocess.CalledProcessError:
     print("outside git repo, not generating new version string")
-exec (open("conjure_python_client/_version.py").read())
+exec(open("conjure_python_client/_version.py").read())
 
 
 class FormatCommand(Command):
     """Enables setup.py format."""
+
     description = "Reformat python files using 'black'"
     user_options = [
         ("check", "c", "Don't write the files back, just return the status")
@@ -64,10 +66,10 @@ class FormatCommand(Command):
             pass
 
     def black(self):
-        return system("black --line-length 79 *.py **/*.py")
+        return system("black --line-length 79 .")
 
     def blackCheck(self):
-        return system("black --check --quiet --line-length 79 *.py **/*.py")
+        return system("black --check --quiet --line-length 79 .")
 
 
 setup(
@@ -84,7 +86,8 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["enum34", "future", "requests", "typing"],
+    install_requires=["requests"],
     tests_require=["pytest", "pyyaml"],
+    python_requires=">=3.8",
     cmdclass={"format": FormatCommand},
 )

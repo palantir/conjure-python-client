@@ -13,8 +13,7 @@
 # limitations under the License.
 
 
-def sanitize_identifier(identifier):
-    # type: (str) -> str
+def sanitize_identifier(identifier: str) -> str:
     """
     Get santized identifier name for identifiers which happen to be python
     keywords.

@@ -15,30 +15,43 @@
 import pytest
 from conjure_python_client import ServiceConfiguration, RequestsClient, Service
 from test.generated.conjure_verification_types import (
-    IntegerExample, StringExample, ListExample, MapExample, OptionalExample,
-    EnumExample, EnumFieldExample, EmptyObjectExample, Union
+    IntegerExample,
+    StringExample,
+    ListExample,
+    MapExample,
+    OptionalExample,
+    EnumExample,
+    EnumFieldExample,
+    EmptyObjectExample,
+    Union,
 )
 
-@pytest.mark.parametrize('obj', [
-    IntegerExample(10),
-    StringExample('Hello World'),
-    ListExample(['a', 'b']),
-    MapExample({'a': 1, 'b': 2}),
-    OptionalExample(None),
-    OptionalExample('Hello World'),
-    EnumFieldExample(EnumExample.ONE),
-    EmptyObjectExample(),
-    Union(string_example='Hello World'),
-    Union(this_field_is_an_integer=10),
-    Union(if_=10)
-])
+
+@pytest.mark.parametrize(
+    "obj",
+    [
+        IntegerExample(10),
+        StringExample("Hello World"),
+        ListExample(["a", "b"]),
+        MapExample({"a": str(1), "b": str(2)}),
+        OptionalExample(None),
+        OptionalExample("Hello World"),
+        EnumFieldExample(EnumExample.ONE),
+        EmptyObjectExample(),
+        Union(string_example=StringExample("Hello World")),
+        Union(this_field_is_an_integer=10),
+        Union(if_=10),
+    ],
+)
 def test_repr(obj):
     assert eval(repr(obj)) == obj
 
 
 def test_repr_service():
     config = ServiceConfiguration()
-    config.uris = ['http://one/', 'http://two/']
+    config.uris = ["http://one/", "http://two/"]
     service = RequestsClient.create(Service, "user-agent", config)
-    assert repr(service) == \
-        'Service(requests_session=requests.Session(...), uris=[\'http://one/\', \'http://two/\'])'
+    assert (
+        repr(service)
+        == "Service(requests_session=requests.Session(...), uris=['http://one/', 'http://two/'])"
+    )
