@@ -16,6 +16,7 @@ import re
 import pytest
 import json
 from .conftest import TEST_CASES
+from _pytest.outcomes import TEST_OUTCOME
 
 
 def convert_to_snake_case(name):
@@ -52,14 +53,13 @@ def run_test(should_pass, is_blacklisted, runnable):
     # If the test is blacklisted, we inverse the logic, to ensure that it would have "failed" the normal test.
     if not is_blacklisted:
         run_test_inner(runnable, should_pass)
-    # TODO(forozco): better handle tests failing in one environment and passing in another
-    # else:
-    #     try:
-    #         run_test_inner(runnable, not should_pass)
-    #     except Exception:
-    #         pytest.fail("The test passed but the test case was ignored - remove this from ignored-test-cases.yml")
-    #     # If it did behave as intended, then skip it in the end if it was blacklisted.
-    #     pytest.skip("Blacklisted")
+    else:
+        try:
+            run_test_inner(runnable, not should_pass)
+        except TEST_OUTCOME:
+            pytest.fail("The test passed but the test case was ignored - remove this from ignored-test-cases.yml")
+        # If it did behave as intended, then skip it in the end if it was blacklisted.
+        pytest.skip("Blacklisted")
 
 
 def run_test_inner(runnable, should_succeed):
@@ -67,8 +67,9 @@ def run_test_inner(runnable, should_succeed):
     if should_succeed:
         runnable()
     else:
-        with pytest.raises(Exception, message="Expected test to fail"):
+        with pytest.raises(Exception):
             runnable()
+            pytest.fail("Expected test to fail")
 
 
 @pytest.mark.parametrize('endpoint_name,method_name,index,case,should_pass', generate_auto_deserialize_tests())

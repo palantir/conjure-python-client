@@ -16,18 +16,17 @@ from typing import List, Any
 
 
 class SslConfiguration(object):
-    trust_store_path = None  # type: str
+    trust_store_path: str = None
 
-    def __init__(self, trust_store_path):
-        # type: (str) -> None
+    def __init__(self, trust_store_path: str) -> None:
         self.trust_store_path = trust_store_path
 
 
 class ServiceConfiguration(object):
-    api_token = None  # type: str
-    security = SslConfiguration  # type: Any
-    connect_timeout = 10  # type: float
-    read_timeout = 300  # type: float
-    uris = []  # type: List[str]
-    max_num_retries = 4  # type: int
-    backoff_slot_size = 250  # type: int
+    api_token: str = None
+    security: Any = SslConfiguration
+    connect_timeout: float = 10
+    read_timeout: float = 300
+    uris: List[str] = []
+    max_num_retries: int = 4
+    backoff_slot_size: int = 250

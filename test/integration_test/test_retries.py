@@ -22,13 +22,13 @@ from ..generated.conjure_verification_server import (
     AutoDeserializeConfirmService,
     AutoDeserializeService
 )
-import mock
+from unittest import mock
 
 
 class MockServerRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         pass
-    
+
     def do_POST(self):
         pass
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from conjure_python_client import ConjureHTTPError, RequestsClient, ServiceConfiguration
-import mock
+from unittest import mock
 import pytest
 import requests
 from requests.exceptions import HTTPError
