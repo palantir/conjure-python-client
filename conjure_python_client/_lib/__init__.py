@@ -21,7 +21,6 @@ __all__ = [
     "ConjureEnumType",
     "ConjureFieldDefinition",
     "ConjureType",
-    "DecodableType",
     "ConjureUnionType",
     "DecodableType",
     "DictType",

@@ -32,7 +32,9 @@ class ConjureFieldDefinition:
     identifier: str
     field_type: Type[DecodableType]
 
-    def __init__(self, identifier: str, field_type: Type[DecodableType]) -> None:
+    def __init__(
+        self, identifier: str, field_type: Type[DecodableType]
+    ) -> None:
         self.identifier = identifier
         self.field_type = field_type
 
@@ -49,7 +51,7 @@ class DictType(ConjureType):
     value_type: Type[DecodableType]
 
     def __init__(
-            self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
     ) -> None:
         self.key_type = key_type
         self.value_type = value_type
