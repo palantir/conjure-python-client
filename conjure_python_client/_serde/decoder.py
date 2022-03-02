@@ -105,7 +105,7 @@ class ConjureDecoder(object):
 
         deserialized: Dict[str, Any] = {}
         if type_of_union not in obj or obj[type_of_union] is None:
-            cls.check_null_field(obj, deserialized, conjure_field_definition)
+            cls.check_null_field(obj, deserialized, attribute, conjure_field_definition)
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
@@ -252,7 +252,7 @@ class ConjureDecoder(object):
 
         Args:
             obj: the json object to decode
-            element_type: a class object which is the type we're decoding into.
+            obj_type: a class object which is the type we're decoding into.
         """
         if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType):
             return cls.decode_conjure_bean_type(obj, obj_type)

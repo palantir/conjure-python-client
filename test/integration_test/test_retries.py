@@ -51,7 +51,7 @@ def server():
     mock_server = HTTPServer(("localhost", port), MockServerRequestHandler)
 
     mock_server_thread = Thread(target=mock_server.serve_forever)
-    mock_server_thread.setDaemon(True)
+    mock_server_thread.daemon = True
     mock_server_thread.start()
 
     yield mock_server

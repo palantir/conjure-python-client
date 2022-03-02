@@ -29,15 +29,15 @@ DecodableType = Union[
 
 
 class ListType(ConjureType):
-    item_type: Type[DecodableType] = None
+    item_type: Type[DecodableType]
 
     def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
 
 
 class DictType(ConjureType):
-    key_type: Type[DecodableType] = None
-    value_type: Type[DecodableType] = None
+    key_type: Type[DecodableType]
+    value_type: Type[DecodableType]
 
     def __init__(
         self, key_type: Type[DecodableType], value_type: Type[DecodableType]
@@ -47,7 +47,7 @@ class DictType(ConjureType):
 
 
 class OptionalType(ConjureType):
-    item_type: Type[DecodableType] = None
+    item_type: Type[DecodableType]
 
     def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
@@ -70,7 +70,7 @@ class ConjureEnumType(ConjureType, Enum):
 
 class ConjureBeanType(ConjureType):
     @classmethod
-    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+    def _fields(cls) -> Dict[str, 'ConjureFieldDefinition']:
         """_fields is a mapping from constructor argument
         name to the field definition"""
         return {}
@@ -100,7 +100,7 @@ ConjureTypeType = Union[ConjureType, Type[DecodableType]]
 
 
 class ConjureUnionType(ConjureType):
-    _type: str = None
+    _type: str
 
     @property
     def type(self) -> str:
@@ -108,7 +108,7 @@ class ConjureUnionType(ConjureType):
         return self._type
 
     @classmethod
-    def _options(cls) -> Dict[str, ConjureFieldDefinition]:
+    def _options(cls) -> Dict[str, 'ConjureFieldDefinition']:
         """_options defines a mapping from each member in the union
         to the field definition for that type"""
         return {}
@@ -139,9 +139,9 @@ class ConjureUnionType(ConjureType):
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
 
 
-class ConjureFieldDefinition(object):
-    identifier: str = None
-    field_type: ConjureTypeType = None
+class ConjureFieldDefinition:
+    identifier: str
+    field_type: ConjureTypeType
 
     def __init__(self, identifier: str, field_type: ConjureTypeType) -> None:
         self.identifier = identifier

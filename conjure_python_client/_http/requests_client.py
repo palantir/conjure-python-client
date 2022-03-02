@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from requests.adapters import HTTPAdapter
-from typing import TypeVar, Type, List, Optional, Dict
+from requests.adapters import HTTPAdapter, Response
+from typing import TypeVar, Type, List, Optional, Dict, Any, Union
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
@@ -58,11 +58,11 @@ def fresh_trace_id() -> bytes:
 
 
 class Service(object):
-    _requests_session: requests.Session = None
-    _uris: List[str] = None
-    _connect_timeout: float = None
-    _read_timeout: float = None
-    _verify: str = None
+    _requests_session: requests.Session
+    _uris: List[str]
+    _connect_timeout: float
+    _read_timeout: float
+    _verify: str
 
     def __init__(
         self,
@@ -102,7 +102,7 @@ class Service(object):
             self.__class__.__name__, "requests.Session(...)", repr(self._uris)
         )
 
-    def _amend_request_kwargs(self, kwargs) -> Dict[str, str]:
+    def _amend_request_kwargs(self, kwargs) -> None:
         for param_kind in ["headers", "params"]:
             if param_kind in kwargs:
                 kwargs[param_kind] = _clean_params(kwargs[param_kind])
@@ -111,7 +111,7 @@ class Service(object):
         _add_trace_id(kwargs)
 
 
-def _clean_params(params: Dict[str, Any]) -> Dict[str, str]:
+def _clean_params(params: Dict[str, Any]) -> Dict[str, Any]:
     cleaned_params = {}
     for key, value in params.items():
         if value is None:
@@ -120,7 +120,7 @@ def _clean_params(params: Dict[str, Any]) -> Dict[str, str]:
     return cleaned_params
 
 
-def _clean_param_value(value: Any) -> str:
+def _clean_param_value(value: Any) -> Any:
     if isinstance(value, list):
         return [_clean_param_value(element) for element in value]
     if isinstance(value, bool):
@@ -128,7 +128,7 @@ def _clean_param_value(value: Any) -> str:
     return str(value)
 
 
-def _add_trace_id(kwargs: Dict[str, Any]) -> Dict[str, str]:
+def _add_trace_id(kwargs: Dict[str, Any]) -> None:
     # Adds the trace ID to the arguments
     if "headers" not in kwargs:
         kwargs["headers"] = {}
@@ -138,16 +138,17 @@ def _add_trace_id(kwargs: Dict[str, Any]) -> Dict[str, str]:
 class RetryWithJitter(Retry):
     """
     Extends the standard urllib Retry in order to match conjure behaviour.
-    Retry times contain a uniform jitter. Additionally all http methods are
+    Retry times contain a uniform jitter. Additionally, all http methods are
     considered valid to retry.
     """
 
-    def _is_method_retryable(self, method):
+    @classmethod
+    def _is_method_retryable(cls, method):
         return True
 
     def get_backoff_time(self):
         jitter = random.random()
-        return jitter * super(RetryWithJitter, self).get_backoff_time()
+        return jitter * super().get_backoff_time()
 
 
 class RequestsClient(object):
@@ -176,7 +177,7 @@ class RequestsClient(object):
             verify = None
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
-        return service_class(
+        return service_class( # type: ignore
             session,
             service_config.uris,
             service_config.connect_timeout,
@@ -206,15 +207,15 @@ class TransportAdapter(HTTPAdapter):
 
 
 class ConjureHTTPError(HTTPError):
-    """A an HTTPError from a Conjure Service with ``SerializableError``
+    """An HTTPError from a Conjure Service with ``SerializableError``
     attributes extracted from the response."""
 
-    _cause: Optional[HTTPError] = None
-    _error_code: str = None
-    _error_name: str = None
-    _error_instance_id: str = None
-    _parameters: Dict[str, str] = None
-    _trace_id: str = None
+    _cause: Optional[HTTPError]
+    _error_code: str
+    _error_name: str
+    _error_instance_id: str
+    _parameters: Dict[str, str]
+    _trace_id: str
 
     def __init__(self, http_error: HTTPError) -> None:
         self._cause = http_error

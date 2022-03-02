@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Any
+from typing import List, Any, Optional, Type
 
 
 class SslConfiguration(object):
-    trust_store_path: str = None
+    trust_store_path: str
 
     def __init__(self, trust_store_path: str) -> None:
         self.trust_store_path = trust_store_path
 
 
 class ServiceConfiguration(object):
-    api_token: str = None
-    security: Any = SslConfiguration
+    api_token: Optional[str] = None
+    security: Type[SslConfiguration] = SslConfiguration
     connect_timeout: float = 10
     read_timeout: float = 300
     uris: List[str] = []
