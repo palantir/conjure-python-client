@@ -25,7 +25,8 @@ from test.example_service.product import SimpleService
 
 
 class TestHttpRemoting(object):
-    def _test_service(self) -> SimpleService:
+    @staticmethod
+    def _test_service() -> SimpleService:
         config = ServiceConfiguration()
         config.uris = ["https://dummy/simple/api"]
         service = RequestsClient.create(
@@ -33,8 +34,8 @@ class TestHttpRemoting(object):
         )
         return service
 
+    @staticmethod
     def _mock_response(
-        self,
         status=200,
         content="CONTENT",
         json_data=None,

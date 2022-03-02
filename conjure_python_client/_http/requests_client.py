@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from requests.adapters import HTTPAdapter, Response
+from requests.adapters import HTTPAdapter, Response, CaseInsensitiveDict
 from typing import TypeVar, Type, List, Optional, Dict, Any, Union
 from requests.exceptions import HTTPError
 from requests.packages.urllib3.poolmanager import PoolManager
@@ -170,7 +170,7 @@ class RequestsClient(object):
         transport_adapter = TransportAdapter(max_retries=retry)
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()
-        session.headers = {"User-Agent": user_agent}
+        session.headers = CaseInsensitiveDict({"User-Agent": user_agent})
         if service_config.security is not None:
             verify = service_config.security.trust_store_path
         else:
