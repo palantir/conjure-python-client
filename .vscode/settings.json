@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
     "python.testing.pytestArgs": [
         "--capture=no", "test"
     ],

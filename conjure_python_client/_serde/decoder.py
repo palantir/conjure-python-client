@@ -278,7 +278,7 @@ class ConjureDecoder(object):
 
         return cls.decode_primitive(obj, obj_type)
 
-    def decode(self, obj: Anu, obj_type: ConjureTypeType) -> Any:
+    def decode(self, obj: Any, obj_type: ConjureTypeType) -> Any:
         return self.do_decode(obj, obj_type)
 
     def read_from_string(
