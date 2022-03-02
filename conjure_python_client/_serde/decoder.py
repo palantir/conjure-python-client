@@ -20,7 +20,8 @@ from .._lib import (
     DictType,
     ListType,
     OptionalType,
-    BinaryType)
+    BinaryType,
+)
 from typing import Optional
 from typing import Dict, Any, List
 import inspect
@@ -43,23 +44,28 @@ class ConjureDecoder(object):
             A instance of a bean of type conjure_type.
         """
         deserialized: Dict[str, Any] = {}
-        for (python_arg_name, field_definition) \
-                in conjure_type._fields().items():
+        for (
+            python_arg_name,
+            field_definition,
+        ) in conjure_type._fields().items():
             field_identifier = field_definition.identifier
 
             if field_identifier not in obj or obj[field_identifier] is None:
                 cls.check_null_field(
-                    obj, deserialized, python_arg_name, field_definition)
+                    obj, deserialized, python_arg_name, field_definition
+                )
             else:
                 value = obj[field_identifier]
                 field_type = field_definition.field_type
-                deserialized[python_arg_name] = \
-                    cls.do_decode(value, field_type)
+                deserialized[python_arg_name] = cls.do_decode(
+                    value, field_type
+                )
         return conjure_type(**deserialized)
 
     @classmethod
     def check_null_field(
-            cls, obj, deserialized, python_arg_name, field_definition):
+        cls, obj, deserialized, python_arg_name, field_definition
+    ):
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
@@ -119,8 +125,10 @@ class ConjureDecoder(object):
         """
         if not (isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"):
             raise Exception(
-                'Expected to find str type but found {} instead'.format(
-                    type(obj)))
+                "Expected to find str type but found {} instead".format(
+                    type(obj)
+                )
+            )
 
         if obj in conjure_type.__members__:
             return conjure_type[obj]
@@ -130,10 +138,10 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_dict(
-            cls,
-            obj: Dict[Any, Any],
-            key_type: ConjureTypeType,
-            item_type: ConjureTypeType,
+        cls,
+        obj: Dict[Any, Any],
+        key_type: ConjureTypeType,
+        item_type: ConjureTypeType,
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -150,20 +158,38 @@ class ConjureDecoder(object):
         """
         if not isinstance(obj, dict):
             raise Exception("expected a python dict")
-        if key_type == str or isinstance(key_type, BinaryType) \
-            or (inspect.isclass(key_type)
-                and issubclass(key_type, ConjureEnumType)):
-            return dict((
-                (cls.do_decode(x[0], key_type), cls.do_decode(x[1], item_type))
-                for x in obj.items()))
+        if (
+            key_type == str
+            or isinstance(key_type, BinaryType)
+            or (
+                inspect.isclass(key_type)
+                and issubclass(key_type, ConjureEnumType)
+            )
+        ):
+            return dict(
+                (
+                    (
+                        cls.do_decode(x[0], key_type),
+                        cls.do_decode(x[1], item_type),
+                    )
+                    for x in obj.items()
+                )
+            )
 
-        return dict((
-            (cls.do_decode(json.loads(x[0]), key_type),
-             cls.do_decode(x[1], item_type))
-            for x in obj.items()))
+        return dict(
+            (
+                (
+                    cls.do_decode(json.loads(x[0]), key_type),
+                    cls.do_decode(x[1], item_type),
+                )
+                for x in obj.items()
+            )
+        )
 
     @classmethod
-    def decode_list(cls, obj: List[Any], element_type: ConjureTypeType) -> List[Any]:
+    def decode_list(
+        cls, obj: List[Any], element_type: ConjureTypeType
+    ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
         Args:
@@ -180,7 +206,9 @@ class ConjureDecoder(object):
         return list(map(lambda x: cls.do_decode(x, element_type), obj))
 
     @classmethod
-    def decode_optional(cls, obj: Optional[Any], object_type: ConjureTypeType) -> Optional[Any]:
+    def decode_optional(
+        cls, obj: Optional[Any], object_type: ConjureTypeType
+    ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
 
@@ -200,15 +228,18 @@ class ConjureDecoder(object):
     def decode_primitive(cls, obj, object_type):
         def raise_mismatch():
             raise Exception(
-                'Expected to find {} type but found {} instead'.format(
-                    object_type, type(obj)))
+                "Expected to find {} type but found {} instead".format(
+                    object_type, type(obj)
+                )
+            )
 
         if object_type == float:
             return float(obj)
         elif object_type == str or isinstance(object_type, BinaryType):
             # Python 2/3 compatible way of checking string
-            if not (isinstance(obj, str)
-                    or str(type(obj)) == "<type 'unicode'>"):
+            if not (
+                isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"
+            ):
                 raise_mismatch()
         elif not isinstance(obj, object_type):
             raise_mismatch()
@@ -223,18 +254,16 @@ class ConjureDecoder(object):
             obj: the json object to decode
             element_type: a class object which is the type we're decoding into.
         """
-        if inspect.isclass(obj_type) and issubclass(
-                obj_type, ConjureBeanType
-        ):
+        if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType):
             return cls.decode_conjure_bean_type(obj, obj_type)
 
         elif inspect.isclass(obj_type) and issubclass(
-                obj_type, ConjureUnionType
+            obj_type, ConjureUnionType
         ):
             return cls.decode_conjure_union_type(obj, obj_type)
 
         elif inspect.isclass(obj_type) and issubclass(
-                obj_type, ConjureEnumType
+            obj_type, ConjureEnumType
         ):
             return cls.decode_conjure_enum_type(obj, obj_type)
 
@@ -252,6 +281,8 @@ class ConjureDecoder(object):
     def decode(self, obj: Anu, obj_type: ConjureTypeType) -> Any:
         return self.do_decode(obj, obj_type)
 
-    def read_from_string(self, string_value: str, obj_type: ConjureTypeType) -> Any:
+    def read_from_string(
+        self, string_value: str, obj_type: ConjureTypeType
+    ) -> Any:
         deserialized = json.loads(string_value)
         return self.decode(deserialized, obj_type)

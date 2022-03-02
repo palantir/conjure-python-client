@@ -42,8 +42,8 @@ class ConjureEncoder(json.JSONEncoder):
                 break
         else:
             raise ValueError(
-                "could not find attribute for union " +
-                "member {0} of type {1}".format(obj.type, obj.__class__)
+                "could not find attribute for union "
+                + "member {0} of type {1}".format(obj.type, obj.__class__)
             )
 
         defined_field_definition = obj._options()[attribute]
@@ -55,9 +55,9 @@ class ConjureEncoder(json.JSONEncoder):
     @classmethod
     def encode_primitive(cls, obj: Any) -> Any:
         if isinstance(obj, float) and isnan(obj):
-            return 'NaN'
+            return "NaN"
         if isinstance(obj, float) and isinf(obj):
-            return '{}Infinity'.format('-' if obj < 0 else '')
+            return "{}Infinity".format("-" if obj < 0 else "")
         return obj
 
     @classmethod
@@ -76,8 +76,10 @@ class ConjureEncoder(json.JSONEncoder):
             return list(map(cls.do_encode, obj))
 
         elif isinstance(obj, dict):
-            return {cls.do_encode(key): cls.do_encode(value)
-                    for key, value in obj.items()}
+            return {
+                cls.do_encode(key): cls.do_encode(value)
+                for key, value in obj.items()
+            }
 
         else:
             return cls.encode_primitive(obj)

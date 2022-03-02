@@ -40,7 +40,7 @@ def test_object_with_list_field_decodes():
 
 
 def test_object_with_omitted_list_field_decodes():
-    decoded = ConjureDecoder().read_from_string('{}', ListExample)
+    decoded = ConjureDecoder().read_from_string("{}", ListExample)
     assert decoded == ListExample([])
 
 
@@ -50,7 +50,7 @@ def test_object_with_map_field_decodes():
 
 
 def test_object_with_omitted_map_field_decodes():
-    decoded = ConjureDecoder().read_from_string('{}', MapExample)
+    decoded = ConjureDecoder().read_from_string("{}", MapExample)
     assert decoded == MapExample({})
 
 

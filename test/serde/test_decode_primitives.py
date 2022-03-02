@@ -18,16 +18,14 @@ from conjure_python_client import ConjureDecoder
 
 def test_float_decodes():
     decoded = ConjureDecoder.decode_primitive(1.0, float)
-    assert(type(decoded) is float)
+    assert type(decoded) is float
 
 
 def test_int_float_decodes():
     decoded = ConjureDecoder.decode_primitive(1, float)
-    assert(type(decoded) is float)
+    assert type(decoded) is float
 
 
 def test_nan_float_decodes():
     decoded = ConjureDecoder.decode_primitive("NaN", float)
-    assert(type(decoded) is float)
-
-
+    assert type(decoded) is float

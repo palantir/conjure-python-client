@@ -39,7 +39,9 @@ class DictType(ConjureType):
     key_type: Type[DecodableType] = None
     value_type: Type[DecodableType] = None
 
-    def __init__(self, key_type: Type[DecodableType], value_type: Type[DecodableType]) -> None:
+    def __init__(
+        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+    ) -> None:
         self.key_type = key_type
         self.value_type = value_type
 
@@ -67,7 +69,6 @@ class ConjureEnumType(ConjureType, Enum):
 
 
 class ConjureBeanType(ConjureType):
-
     @classmethod
     def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         """_fields is a mapping from constructor argument
@@ -118,12 +119,13 @@ class ConjureUnionType(ConjureType):
 
         assert isinstance(other, ConjureUnionType)
 
-        pythonic_sanitized_identifier = \
-            sanitize_identifier(to_snake_case(self.type))
+        pythonic_sanitized_identifier = sanitize_identifier(
+            to_snake_case(self.type)
+        )
 
-        return other.type == self.type and \
-            getattr(self, pythonic_sanitized_identifier) == \
-            getattr(other, pythonic_sanitized_identifier)
+        return other.type == self.type and getattr(
+            self, pythonic_sanitized_identifier
+        ) == getattr(other, pythonic_sanitized_identifier)
 
     def __ne__(self, other: Any) -> bool:
         return not self == other

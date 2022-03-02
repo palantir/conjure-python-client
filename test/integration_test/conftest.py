@@ -22,19 +22,29 @@ from ..generated.conjure_verification_server import (
     AutoDeserializeService,
     SingleHeaderService,
     SinglePathParamService,
-    SingleQueryParamService
+    SingleQueryParamService,
 )
 
-TEST_CASES = path.dirname(__file__) + '/../../build/resources/verification-server-test-cases.json'
-VERIFICATION_API = path.dirname(__file__) + '/../../build/resources/verification-server-api.conjure.json'
+TEST_CASES = (
+    path.dirname(__file__)
+    + "/../../build/resources/verification-server-test-cases.json"
+)
+VERIFICATION_API = (
+    path.dirname(__file__)
+    + "/../../build/resources/verification-server-api.conjure.json"
+)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def conjure_validation_server():
-    verification_server = subprocess.Popen([
-        path.dirname(__file__) + '/../../build/downloads/bin/conjure-verification-server',
-        TEST_CASES,
-        VERIFICATION_API])
+    verification_server = subprocess.Popen(
+        [
+            path.dirname(__file__)
+            + "/../../build/downloads/bin/conjure-verification-server",
+            TEST_CASES,
+            VERIFICATION_API,
+        ]
+    )
     yield verification_server
     verification_server.terminate()
 
@@ -42,35 +52,48 @@ def conjure_validation_server():
 @pytest.fixture()
 def config():
     config = ServiceConfiguration()
-    config.uris = ['http://localhost:8000']
+    config.uris = ["http://localhost:8000"]
     return config
 
 
 @pytest.fixture()
 def body_service(config):
-    return RequestsClient.create(AutoDeserializeService, 'conjure-python/0.0.0', config)
+    return RequestsClient.create(
+        AutoDeserializeService, "conjure-python/0.0.0", config
+    )
 
 
 @pytest.fixture()
 def header_service(config):
-    return RequestsClient.create(SingleHeaderService, 'conjure-python/0.0.0', config)
+    return RequestsClient.create(
+        SingleHeaderService, "conjure-python/0.0.0", config
+    )
 
 
 @pytest.fixture()
 def path_service(config):
-    return RequestsClient.create(SinglePathParamService, 'conjure-python/0.0.0', config)
+    return RequestsClient.create(
+        SinglePathParamService, "conjure-python/0.0.0", config
+    )
 
 
 @pytest.fixture()
 def query_service(config):
-    return RequestsClient.create(SingleQueryParamService, 'conjure-python/0.0.0', config)
+    return RequestsClient.create(
+        SingleQueryParamService, "conjure-python/0.0.0", config
+    )
 
 
 @pytest.fixture()
 def confirm_service(config):
-    return RequestsClient.create(AutoDeserializeConfirmService, 'conjure-python/0.0.0', config)
+    return RequestsClient.create(
+        AutoDeserializeConfirmService, "conjure-python/0.0.0", config
+    )
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def test_black_list():
-    with open(path.dirname(__file__) + '/../../resources/ignored_test_cases.yml') as blacklist_file:
-        return yaml.safe_load(blacklist_file)['client']
+    with open(
+        path.dirname(__file__) + "/../../resources/ignored_test_cases.yml"
+    ) as blacklist_file:
+        return yaml.safe_load(blacklist_file)["client"]
