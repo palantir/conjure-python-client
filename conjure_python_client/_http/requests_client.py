@@ -177,7 +177,7 @@ class RequestsClient(object):
             verify = None
         for uri in service_config.uris:
             session.mount(uri, transport_adapter)
-        return service_class( # type: ignore
+        return service_class(  # type: ignore
             session,
             service_config.uris,
             service_config.connect_timeout,
