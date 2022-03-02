@@ -90,4 +90,7 @@ setup(
     tests_require=["pytest", "pyyaml"],
     python_requires=">=3.8",
     cmdclass={"format": FormatCommand},
+    package_data = {
+        'conjure_python_client': ['py.typed'],
+    },
 )
