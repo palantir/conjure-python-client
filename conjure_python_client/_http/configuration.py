@@ -23,10 +23,10 @@ class SslConfiguration(object):
 
 
 class ServiceConfiguration(object):
-    api_token: Optional[str] = None
-    security: Type[SslConfiguration] = SslConfiguration
+    api_token: Optional[str]
+    security: SslConfiguration
     connect_timeout: float = 10
     read_timeout: float = 300
-    uris: List[str] = []
+    uris: List[str]
     max_num_retries: int = 4
     backoff_slot_size: int = 250
