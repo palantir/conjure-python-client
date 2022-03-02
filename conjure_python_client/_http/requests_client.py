@@ -19,7 +19,6 @@ from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
-from future.utils import raise_from
 
 import binascii
 import os
@@ -93,7 +92,7 @@ class Service(object):
             _response.raise_for_status()
         except HTTPError as e:
             if e.response is not None:
-                raise_from(ConjureHTTPError(e), e)
+                raise ConjureHTTPError(e) from e
             raise e
         return _response
 

@@ -27,7 +27,7 @@ jobs:
 
   py3:
     docker:
-      - image: cimg/python:3.6.15
+      - image: cimg/python:3.8.12
     steps:
       - checkout
 
@@ -62,7 +62,7 @@ jobs:
 
   mypy3:
     docker:
-      - image: cimg/python:3.6.15
+      - image: cimg/python:3.8.12
     steps:
       - checkout
 
@@ -94,7 +94,7 @@ jobs:
 
   lint:
     docker:
-      - image: cimg/python:3.6.15
+      - image: cimg/python:3.8.12
     steps:
       - checkout
 
@@ -126,7 +126,7 @@ jobs:
 
   publish-wheel:
     docker:
-      - image: cimg/python:3.6.15
+      - image: cimg/python:3.8.12
     steps:
       - checkout
       - deploy:
