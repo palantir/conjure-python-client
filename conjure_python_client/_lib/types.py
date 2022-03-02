@@ -24,32 +24,34 @@ class ConjureType(object):
 
 
 DecodableType = Union[
-    int, float, bool, str, ConjureType, List[Any], Dict[Any, Any]
+    Any, int, float, bool, str, ConjureType, List[Any], Dict[Any, Any]
 ]
+
+ConjureTypeType = Union[ConjureType, Type[DecodableType]]
 
 
 class ListType(ConjureType):
-    item_type: Type[DecodableType]
+    item_type: ConjureTypeType
 
-    def __init__(self, item_type: Type[DecodableType]) -> None:
+    def __init__(self, item_type: ConjureTypeType) -> None:
         self.item_type = item_type
 
 
 class DictType(ConjureType):
-    key_type: Type[DecodableType]
-    value_type: Type[DecodableType]
+    key_type: ConjureTypeType
+    value_type: ConjureTypeType
 
     def __init__(
-        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+        self, key_type: ConjureTypeType, value_type: ConjureTypeType
     ) -> None:
         self.key_type = key_type
         self.value_type = value_type
 
 
 class OptionalType(ConjureType):
-    item_type: Type[DecodableType]
+    item_type: ConjureTypeType
 
-    def __init__(self, item_type: Type[DecodableType]) -> None:
+    def __init__(self, item_type: ConjureTypeType) -> None:
         self.item_type = item_type
 
 
@@ -94,9 +96,6 @@ class ConjureBeanType(ConjureType):
             for attr, field_def in self._fields().items()
         ]
         return "{}({})".format(self.__class__.__name__, ", ".join(fields))
-
-
-ConjureTypeType = Union[ConjureType, Type[DecodableType]]
 
 
 class ConjureUnionType(ConjureType):
