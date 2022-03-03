@@ -29,6 +29,7 @@ import json
 
 NoneType = type(None)
 
+
 class ConjureDecoder(object):
     """Decodes json into a conjure object"""
 
@@ -296,17 +297,22 @@ class ConjureDecoder(object):
             return cls.decode_optional(obj, obj_type.item_type)
 
         elif type_origin == dict:
-            return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
+            (key_type, value_type) = type_args
+            return cls.decode_dict(obj, key_type, value_type)
 
         elif type_origin == list:
-            return cls.decode_list(obj, obj_type.item_type)
+            (value_type) = type_args
+            return cls.decode_list(obj, value_type)
 
         elif (
             type_origin == Union
             and len(type_args) == 2
             and NoneType in type_args
         ):
-            return cls.decode_optional(obj, obj_type.item_type)
+            item_types = [
+                type_arg for type_arg in type_args if type_arg is not NoneType
+            ]
+            return cls.decode_optional(obj, item_types[0])
 
         return cls.decode_primitive(obj, obj_type)
 
