@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import List, Dict, Type, Any, Union
+from typing import List, Dict, Type, Any, Union, Optional
 
 from .case import to_snake_case
 from .sanitize import sanitize_identifier
@@ -24,7 +24,15 @@ class ConjureType(object):
 
 
 DecodableType = Union[
-    object, int, float, bool, str, ConjureType, List[Any], Dict[Any, Any]
+    object,
+    int,
+    float,
+    bool,
+    str,
+    ConjureType,
+    List[Any],
+    Dict[Any, Any],
+    Optional[Any],
 ]
 
 

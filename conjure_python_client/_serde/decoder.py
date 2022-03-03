@@ -11,17 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from types import NoneType
+
 from .._lib import (
     ConjureBeanType,
     ConjureEnumType,
     ConjureUnionType,
     DecodableType,
+    BinaryType,
     DictType,
     ListType,
     OptionalType,
-    BinaryType,
 )
-from typing import Optional, Type
+from typing import Optional, Type, Union, get_origin, get_args
 from typing import Dict, Any, List
 import inspect
 import json
@@ -65,11 +67,23 @@ class ConjureDecoder(object):
     def check_null_field(
         cls, obj, deserialized, python_arg_name, field_definition
     ):
+        type_origin = get_origin(field_definition.field_type)
+        type_args = get_args(field_definition.field_type)
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
+            deserialized[python_arg_name] = None
+        elif type_origin == list:
+            deserialized[python_arg_name] = []
+        elif type_origin == dict:
+            deserialized[python_arg_name] = {}
+        elif (
+            type_origin == Union
+            and len(type_args) == 2
+            and NoneType in type_args
+        ):
             deserialized[python_arg_name] = None
         else:
             raise Exception(
@@ -255,6 +269,10 @@ class ConjureDecoder(object):
             obj: the json object to decode
             obj_type: a class object which is the type we're decoding into.
         """
+
+        type_origin = get_origin(obj_type)
+        type_args = get_args(obj_type)
+
         if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType):
             return cls.decode_conjure_bean_type(obj, obj_type)
 
@@ -275,6 +293,19 @@ class ConjureDecoder(object):
             return cls.decode_list(obj, obj_type.item_type)
 
         elif isinstance(obj_type, OptionalType):
+            return cls.decode_optional(obj, obj_type.item_type)
+
+        elif type_origin == dict:
+            return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
+
+        elif type_origin == list:
+            return cls.decode_list(obj, obj_type.item_type)
+
+        elif (
+            type_origin == Union
+            and len(type_args) == 2
+            and NoneType in type_args
+        ):
             return cls.decode_optional(obj, obj_type.item_type)
 
         return cls.decode_primitive(obj, obj_type)
