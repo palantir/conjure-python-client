@@ -18,7 +18,7 @@ from .._lib import (
     ConjureUnionType,
     DecodableType,
     BinaryType,
-    OptionalWrapper,
+    OptionalTypeWrapper,
     DictType,
     ListType,
     OptionalType,
@@ -76,11 +76,11 @@ class ConjureDecoder(object):
             deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
             deserialized[python_arg_name] = None
-        elif isinstance(field_definition.field_type, OptionalWrapper):
+        elif type_origin is OptionalTypeWrapper:
             deserialized[python_arg_name] = None
-        elif type_origin == list:
+        elif type_origin is list:
             deserialized[python_arg_name] = []
-        elif type_origin == dict:
+        elif type_origin is dict:
             deserialized[python_arg_name] = {}
         else:
             raise Exception(
@@ -292,14 +292,14 @@ class ConjureDecoder(object):
         elif isinstance(obj_type, OptionalType):
             return cls.decode_optional(obj, obj_type.item_type)
 
-        elif isinstance(obj_type, OptionalWrapper):
+        elif type_origin is OptionalTypeWrapper:
             return cls.decode_optional(obj, type_args[0])
 
-        elif type_origin == dict:
+        elif type_origin is dict:
             (key_type, value_type) = type_args
             return cls.decode_dict(obj, key_type, value_type)
 
-        elif type_origin == list:
+        elif type_origin is list:
             return cls.decode_list(obj, type_args[0])
 
 
