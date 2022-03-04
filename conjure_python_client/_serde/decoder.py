@@ -171,8 +171,8 @@ class ConjureDecoder(object):
         if not isinstance(obj, dict):
             raise Exception("expected a python dict")
         if (
-            key_type == str
-            or isinstance(key_type, BinaryType)
+            key_type is str
+            or key_type is BinaryType
             or (
                 inspect.isclass(key_type)
                 and issubclass(key_type, ConjureEnumType)
@@ -245,9 +245,9 @@ class ConjureDecoder(object):
                 )
             )
 
-        if object_type == float:
+        if object_type is float:
             return float(obj)
-        elif object_type == str or isinstance(object_type, BinaryType):
+        elif object_type is str or object_type is BinaryType:
             # Python 2/3 compatible way of checking string
             if not (
                 isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"
