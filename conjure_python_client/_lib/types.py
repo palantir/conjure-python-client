@@ -32,7 +32,7 @@ DecodableType = Union[
     ConjureType,
     List[Any],
     Dict[Any, Any],
-    Optional[Any],
+    Union[Any, type(None)],
 ]
 
 
