@@ -293,15 +293,14 @@ class ConjureDecoder(object):
             return cls.decode_optional(obj, obj_type.item_type)
 
         elif isinstance(obj_type, OptionalWrapper):
-            return cls.decode_optional(obj, obj_type.item_type)
+            return cls.decode_optional(obj, type_args[0])
 
         elif type_origin == dict:
             (key_type, value_type) = type_args
             return cls.decode_dict(obj, key_type, value_type)
 
         elif type_origin == list:
-            (value_type) = type_args
-            return cls.decode_list(obj, value_type)
+            return cls.decode_list(obj, type_args[0])
 
 
         return cls.decode_primitive(obj, obj_type)

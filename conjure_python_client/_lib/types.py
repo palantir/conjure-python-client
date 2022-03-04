@@ -39,11 +39,7 @@ T = TypeVar('T', bound=DecodableType)
 
 
 class OptionalWrapper(ConjureType, Generic[T]):
-    item_type: T
-
-    def __init__(self, item_type: T) -> None:
-        self.item_type = item_type
-
+    pass
 
 class ConjureFieldDefinition:
     identifier: str
