@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from .._lib import (
     ConjureBeanType,
     ConjureEnumType,
     ConjureUnionType,
     DecodableType,
     BinaryType,
-    DecodableTypeType,
+    OptionalWrapper,
     DictType,
     ListType,
     OptionalType,
@@ -69,23 +70,18 @@ class ConjureDecoder(object):
         cls, obj, deserialized, python_arg_name, field_definition
     ):
         type_origin = get_origin(field_definition.field_type)
-        type_args = get_args(field_definition.field_type)
         if isinstance(field_definition.field_type, ListType):
             deserialized[python_arg_name] = []
         elif isinstance(field_definition.field_type, DictType):
             deserialized[python_arg_name] = {}
         elif isinstance(field_definition.field_type, OptionalType):
             deserialized[python_arg_name] = None
+        elif isinstance(field_definition.field_type, OptionalWrapper):
+            deserialized[python_arg_name] = None
         elif type_origin == list:
             deserialized[python_arg_name] = []
         elif type_origin == dict:
             deserialized[python_arg_name] = {}
-        elif (
-            type_origin == Union
-            and len(type_args) == 2
-            and NoneType in type_args
-        ):
-            deserialized[python_arg_name] = None
         else:
             raise Exception(
                 "field {} not found in object {}".format(
@@ -156,8 +152,8 @@ class ConjureDecoder(object):
     def decode_dict(
         cls,
         obj: Dict[Any, Any],
-        key_type: DecodableTypeType,
-        item_type: DecodableTypeType,
+        key_type: Type[DecodableType],
+        item_type: Type[DecodableType],
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -204,7 +200,7 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_list(
-        cls, obj: List[Any], element_type: DecodableTypeType
+        cls, obj: List[Any], element_type: Type[DecodableType]
     ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
@@ -223,7 +219,7 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_optional(
-        cls, obj: Optional[Any], object_type: DecodableTypeType
+        cls, obj: Optional[Any], object_type: Type[DecodableType]
     ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
@@ -263,7 +259,7 @@ class ConjureDecoder(object):
         return obj
 
     @classmethod
-    def do_decode(cls, obj: Any, obj_type: DecodableTypeType) -> Any:
+    def do_decode(cls, obj: Any, obj_type: Type[DecodableType]) -> Any:
         """Decodes json into the specified type
 
         Args:
@@ -296,6 +292,9 @@ class ConjureDecoder(object):
         elif isinstance(obj_type, OptionalType):
             return cls.decode_optional(obj, obj_type.item_type)
 
+        elif isinstance(obj_type, OptionalWrapper):
+            return cls.decode_optional(obj, obj_type.item_type)
+
         elif type_origin == dict:
             (key_type, value_type) = type_args
             return cls.decode_dict(obj, key_type, value_type)
@@ -304,23 +303,14 @@ class ConjureDecoder(object):
             (value_type) = type_args
             return cls.decode_list(obj, value_type)
 
-        elif (
-            type_origin == Union
-            and len(type_args) == 2
-            and NoneType in type_args
-        ):
-            item_types = [
-                type_arg for type_arg in type_args if type_arg is not NoneType
-            ]
-            return cls.decode_optional(obj, item_types[0])
 
         return cls.decode_primitive(obj, obj_type)
 
-    def decode(self, obj: Any, obj_type: DecodableTypeType) -> Any:
+    def decode(self, obj: Any, obj_type: Type[DecodableType]) -> Any:
         return self.do_decode(obj, obj_type)
 
     def read_from_string(
-        self, string_value: str, obj_type: DecodableTypeType
+        self, string_value: str, obj_type: Type[DecodableType]
     ) -> Any:
         deserialized = json.loads(string_value)
         return self.decode(deserialized, obj_type)

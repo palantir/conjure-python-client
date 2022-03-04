@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import List, Dict, Type, Any, Union, Optional
+from typing import List, Dict, Type, Any, Union, Optional, TypeVar, Generic
 
 from .case import to_snake_case
 from .sanitize import sanitize_identifier
@@ -34,41 +34,50 @@ DecodableType = Union[
     Dict[Any, Any],
 ]
 
-DecodableTypeType = Union[Type[DecodableType], Type[Optional[Any]]]
+
+T = TypeVar('T', bound=DecodableType)
+
+
+class OptionalWrapper(ConjureType, Generic[T]):
+    item_type: T
+
+    def __init__(self, item_type: T) -> None:
+        self.item_type = item_type
+
 
 class ConjureFieldDefinition:
     identifier: str
-    field_type: DecodableTypeType
+    field_type: Type[DecodableType]
 
     def __init__(
-        self, identifier: str, field_type: DecodableTypeType
+        self, identifier: str, field_type: Type[DecodableType]
     ) -> None:
         self.identifier = identifier
         self.field_type = field_type
 
 
 class ListType(ConjureType):
-    item_type: DecodableTypeType
+    item_type: Type[DecodableType]
 
-    def __init__(self, item_type: DecodableTypeType) -> None:
+    def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
 
 
 class DictType(ConjureType):
-    key_type: DecodableTypeType
-    value_type: DecodableTypeType
+    key_type: Type[DecodableType]
+    value_type: Type[DecodableType]
 
     def __init__(
-        self, key_type: DecodableTypeType, value_type: DecodableTypeType
+        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
     ) -> None:
         self.key_type = key_type
         self.value_type = value_type
 
 
 class OptionalType(ConjureType):
-    item_type: DecodableTypeType
+    item_type: Type[DecodableType]
 
-    def __init__(self, item_type: DecodableTypeType) -> None:
+    def __init__(self, item_type: Type[DecodableType]) -> None:
         self.item_type = item_type
 
 

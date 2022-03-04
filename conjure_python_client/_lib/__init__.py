@@ -23,5 +23,5 @@ __all__ = [
     "ConjureType",
     "ConjureUnionType",
     "DecodableType",
-    "DecodableTypeType",
+    "OptionalWrapper",
 ]

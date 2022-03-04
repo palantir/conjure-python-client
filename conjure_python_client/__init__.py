@@ -27,6 +27,7 @@ __all__ = [
     "ConjureType",
     "ConjureUnionType",
     "DecodableType",
+    "OptionalWrapper",
     "RequestsClient",
     "Service",
     "ServiceConfiguration",
