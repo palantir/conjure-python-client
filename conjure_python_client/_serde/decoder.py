@@ -248,7 +248,11 @@ class ConjureDecoder(object):
 
         if object_type is float:
             return float(obj)
-        elif object_type is str or object_type is BinaryType or isinstance(object_type, BinaryType):
+        elif (
+            object_type is str
+            or object_type is BinaryType
+            or isinstance(object_type, BinaryType)
+        ):
             # Python 2/3 compatible way of checking string
             if not (
                 isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"
@@ -302,7 +306,6 @@ class ConjureDecoder(object):
 
         elif type_origin is list:
             return cls.decode_list(obj, type_args[0])
-
 
         return cls.decode_primitive(obj, obj_type)
 

@@ -35,11 +35,12 @@ DecodableType = Union[
 ]
 
 
-T = TypeVar('T', bound=DecodableType)
+T = TypeVar("T", bound=DecodableType)
 
 
 class OptionalTypeWrapper(ConjureType, Generic[T]):
     pass
+
 
 class ConjureFieldDefinition:
     identifier: str
