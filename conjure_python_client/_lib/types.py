@@ -32,43 +32,43 @@ DecodableType = Union[
     ConjureType,
     List[Any],
     Dict[Any, Any],
-    Union[Any, type(None)],
 ]
 
+DecodableTypeType = Union[Type[DecodableType], Type[Optional[Any]]]
 
 class ConjureFieldDefinition:
     identifier: str
-    field_type: Type[DecodableType]
+    field_type: DecodableTypeType
 
     def __init__(
-        self, identifier: str, field_type: Type[DecodableType]
+        self, identifier: str, field_type: DecodableTypeType
     ) -> None:
         self.identifier = identifier
         self.field_type = field_type
 
 
 class ListType(ConjureType):
-    item_type: Type[DecodableType]
+    item_type: DecodableTypeType
 
-    def __init__(self, item_type: Type[DecodableType]) -> None:
+    def __init__(self, item_type: DecodableTypeType) -> None:
         self.item_type = item_type
 
 
 class DictType(ConjureType):
-    key_type: Type[DecodableType]
-    value_type: Type[DecodableType]
+    key_type: DecodableTypeType
+    value_type: DecodableTypeType
 
     def __init__(
-        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
+        self, key_type: DecodableTypeType, value_type: DecodableTypeType
     ) -> None:
         self.key_type = key_type
         self.value_type = value_type
 
 
 class OptionalType(ConjureType):
-    item_type: Type[DecodableType]
+    item_type: DecodableTypeType
 
-    def __init__(self, item_type: Type[DecodableType]) -> None:
+    def __init__(self, item_type: DecodableTypeType) -> None:
         self.item_type = item_type
 
 

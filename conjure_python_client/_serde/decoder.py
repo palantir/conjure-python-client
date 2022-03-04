@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from .._lib import (
     ConjureBeanType,
     ConjureEnumType,
     ConjureUnionType,
     DecodableType,
     BinaryType,
+    DecodableTypeType,
     DictType,
     ListType,
     OptionalType,
@@ -156,8 +156,8 @@ class ConjureDecoder(object):
     def decode_dict(
         cls,
         obj: Dict[Any, Any],
-        key_type: Type[DecodableType],
-        item_type: Type[DecodableType],
+        key_type: DecodableTypeType,
+        item_type: DecodableTypeType,
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -204,7 +204,7 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_list(
-        cls, obj: List[Any], element_type: Type[DecodableType]
+        cls, obj: List[Any], element_type: DecodableTypeType
     ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
@@ -223,7 +223,7 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_optional(
-        cls, obj: Optional[Any], object_type: Type[DecodableType]
+        cls, obj: Optional[Any], object_type: DecodableTypeType
     ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
@@ -263,7 +263,7 @@ class ConjureDecoder(object):
         return obj
 
     @classmethod
-    def do_decode(cls, obj: Any, obj_type: Type[DecodableType]) -> Any:
+    def do_decode(cls, obj: Any, obj_type: DecodableTypeType) -> Any:
         """Decodes json into the specified type
 
         Args:
@@ -316,11 +316,11 @@ class ConjureDecoder(object):
 
         return cls.decode_primitive(obj, obj_type)
 
-    def decode(self, obj: Any, obj_type: Type[DecodableType]) -> Any:
+    def decode(self, obj: Any, obj_type: DecodableTypeType) -> Any:
         return self.do_decode(obj, obj_type)
 
     def read_from_string(
-        self, string_value: str, obj_type: Type[DecodableType]
+        self, string_value: str, obj_type: DecodableTypeType
     ) -> Any:
         deserialized = json.loads(string_value)
         return self.decode(deserialized, obj_type)
