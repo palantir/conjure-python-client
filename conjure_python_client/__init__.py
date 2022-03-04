@@ -30,6 +30,7 @@ __all__ = [
     "DictType",
     "ListType",
     "OptionalType",
+    "OptionalTypeWrapper",
     "RequestsClient",
     "Service",
     "ServiceConfiguration",
