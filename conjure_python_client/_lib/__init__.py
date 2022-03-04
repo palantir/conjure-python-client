@@ -14,7 +14,6 @@
 
 from .types import *
 
-
 __all__ = [
     "BinaryType",
     "ConjureBeanType",
@@ -23,5 +22,8 @@ __all__ = [
     "ConjureType",
     "ConjureUnionType",
     "DecodableType",
+    "DictType",
+    "ListType",
+    "OptionalType",
     "OptionalTypeWrapper",
 ]
