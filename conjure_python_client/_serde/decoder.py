@@ -19,9 +19,6 @@ from .._lib import (
     DecodableType,
     BinaryType,
     OptionalTypeWrapper,
-    DictType,
-    ListType,
-    OptionalType,
 )
 from typing import Optional, Type, Union, get_origin, get_args
 from typing import Dict, Any, List
@@ -70,13 +67,7 @@ class ConjureDecoder(object):
         cls, obj, deserialized, python_arg_name, field_definition
     ):
         type_origin = get_origin(field_definition.field_type)
-        if isinstance(field_definition.field_type, ListType):
-            deserialized[python_arg_name] = []
-        elif isinstance(field_definition.field_type, DictType):
-            deserialized[python_arg_name] = {}
-        elif isinstance(field_definition.field_type, OptionalType):
-            deserialized[python_arg_name] = None
-        elif type_origin is OptionalTypeWrapper:
+        if type_origin is OptionalTypeWrapper:
             deserialized[python_arg_name] = None
         elif type_origin is list:
             deserialized[python_arg_name] = []
@@ -287,15 +278,6 @@ class ConjureDecoder(object):
             obj_type, ConjureEnumType
         ):
             return cls.decode_conjure_enum_type(obj, obj_type)
-
-        elif isinstance(obj_type, DictType):
-            return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
-
-        elif isinstance(obj_type, ListType):
-            return cls.decode_list(obj, obj_type.item_type)
-
-        elif isinstance(obj_type, OptionalType):
-            return cls.decode_optional(obj, obj_type.item_type)
 
         elif type_origin is OptionalTypeWrapper:
             return cls.decode_optional(obj, type_args[0])

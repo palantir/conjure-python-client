@@ -15,7 +15,7 @@
 
 def sanitize_identifier(identifier: str) -> str:
     """
-    Get santized identifier name for identifiers which happen to be python
+    Get sanitized identifier name for identifiers which happen to be python
     keywords.
     """
 

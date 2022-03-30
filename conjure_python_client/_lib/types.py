@@ -53,31 +53,6 @@ class ConjureFieldDefinition:
         self.field_type = field_type
 
 
-class ListType(ConjureType):
-    item_type: Type[DecodableType]
-
-    def __init__(self, item_type: Type[DecodableType]) -> None:
-        self.item_type = item_type
-
-
-class DictType(ConjureType):
-    key_type: Type[DecodableType]
-    value_type: Type[DecodableType]
-
-    def __init__(
-        self, key_type: Type[DecodableType], value_type: Type[DecodableType]
-    ) -> None:
-        self.key_type = key_type
-        self.value_type = value_type
-
-
-class OptionalType(ConjureType):
-    item_type: Type[DecodableType]
-
-    def __init__(self, item_type: Type[DecodableType]) -> None:
-        self.item_type = item_type
-
-
 class BinaryType(ConjureType):
     pass
 
