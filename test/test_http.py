@@ -57,12 +57,12 @@ class TestHttpRemoting(object):
 
     @mock.patch("requests.Session.request")
     def test_http_success(self, mock_request):
-        mock_request.return_value = self._mock_response(json_data="{\"baseUri\": \"foo\", \"fileSystemId\": \"id\"}")
+        mock_request.return_value = self._mock_response(json_data="{\"id\": {\"baseUri\": \"foo\", \"fileSystemId\": \"id\"}}")
         self._test_service().get_file_systems("foo")
 
     @mock.patch("requests.Session.request")
     def test_array_query_parameter(self, mock_request):
-        mock_request.return_value = self._mock_response(json_data="2")
+        mock_request.return_value = self._mock_response(json_data=2)
         self._test_service().test_query_params("auth", "foo", "query", set_end=["branches", "path"], something="smth")
         name, args, kwargs = mock_request.mock_calls[0]
         assert kwargs["params"]["set_end"] == ["branches", "path"]
@@ -148,7 +148,7 @@ class TestHttpRemoting(object):
 
     @mock.patch("requests.Session.request")
     def test_request_trace_id(self, mock_request):
-        mock_request.return_value = self._mock_response(json_data="{\"baseUri\": \"foo\", \"fileSystemId\": \"id\"}")
+        mock_request.return_value = self._mock_response(json_data="{\"id\": {\"baseUri\": \"foo\", \"fileSystemId\": \"id\"}}")
         self._test_service().get_file_systems("foo")
 
         call = mock_request.mock_calls[0]
