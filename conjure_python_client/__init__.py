@@ -24,6 +24,7 @@ __all__ = [
     "ConjureEncoder",
     "ConjureEnumType",
     "ConjureFieldDefinition",
+    "ConjureHTTPError",
     "ConjureType",
     "ConjureUnionType",
     "DecodableType",

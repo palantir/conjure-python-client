@@ -21,16 +21,16 @@ from unittest import mock
 import pytest
 import requests
 from requests.exceptions import HTTPError
-from test.example_service.product import SimpleService
+from test.example_service.another import TestService
 
 
 class TestHttpRemoting(object):
     @staticmethod
-    def _test_service() -> SimpleService:
+    def _test_service() -> TestService:
         config = ServiceConfiguration()
         config.uris = ["https://dummy/simple/api"]
         service = RequestsClient.create(
-            SimpleService, user_agent="pytest", service_config=config
+            TestService, user_agent="pytest", service_config=config
         )
         return service
 
@@ -57,16 +57,14 @@ class TestHttpRemoting(object):
     @mock.patch("requests.Session.request")
     def test_http_success(self, mock_request):
         mock_request.return_value = self._mock_response(json_data="bar")
-        self._test_service().testEndpoint("foo")
+        self._test_service().get_dataset("auth", "foo")
 
     @mock.patch("requests.Session.request")
     def test_array_query_parameter(self, mock_request):
         mock_request.return_value = self._mock_response(json_data="bar")
-        self._test_service().testEndpoint(
-            "foo", decoration=["branches", "path"]
-        )
+        self._test_service().test_query_params("auth", "foo", "query", set_end=["branches", "path"], something="smth")
         name, args, kwargs = mock_request.mock_calls[0]
-        assert kwargs["params"]["decoration"] == ["branches", "path"]
+        assert kwargs["params"]["set_end"] == ["branches", "path"]
 
     @mock.patch("requests.Session.request")
     def test_http_error(self, mock_request):
@@ -84,7 +82,7 @@ class TestHttpRemoting(object):
         )
 
         with pytest.raises(ConjureHTTPError) as e:
-            self._test_service().testEndpoint("foo")
+            self._test_service().get_dataset("auth", "foo")
         assert e.match("Default:NotFound")
         assert e.match("00000000-0000-0000-0000-000000000000")
 
@@ -99,7 +97,7 @@ class TestHttpRemoting(object):
         )
 
         with pytest.raises(ConjureHTTPError) as e:
-            self._test_service().testEndpoint("foo")
+            self._test_service().get_dataset("auth", "foo")
         assert e.match("Content that's not JSON")
 
     @mock.patch("requests.Session.request")
@@ -113,7 +111,7 @@ class TestHttpRemoting(object):
         )
 
         with pytest.raises(ConjureHTTPError) as e:
-            self._test_service().testEndpoint("foo")
+            self._test_service().get_dataset("auth", "foo")
         assert e.match("mocked http error. TraceId: 'None'. Response: ''")
 
     @mock.patch("requests.Session.request")
@@ -127,7 +125,7 @@ class TestHttpRemoting(object):
         )
 
         with pytest.raises(ConjureHTTPError) as e:
-            self._test_service().testEndpoint("foo")
+            self._test_service().get_dataset("auth", "foo")
         assert e.match("mocked http error. TraceId: 'None'. Response: ''")
 
     @mock.patch("requests.Session.request")
@@ -142,7 +140,7 @@ class TestHttpRemoting(object):
         )
 
         with pytest.raises(ConjureHTTPError) as e:
-            self._test_service().testEndpoint("foo")
+            self._test_service().get_dataset("auth", "foo")
         assert e.match(
             "mocked http error. TraceId: 'faketraceid'. Response: ''"
         )
@@ -150,7 +148,7 @@ class TestHttpRemoting(object):
     @mock.patch("requests.Session.request")
     def test_request_trace_id(self, mock_request):
         mock_request.return_value = self._mock_response(json_data="bar")
-        self._test_service().testEndpoint("foo")
+        self._test_service().get_dataset("auth", "foo")
 
         call = mock_request.mock_calls[0]
         call_kwargs = call[2]
@@ -158,7 +156,7 @@ class TestHttpRemoting(object):
         first_trace = call_kwargs["headers"]["X-B3-TraceId"]
 
         mock_request.reset_mock()
-        self._test_service().testEndpoint("foo")
+        self._test_service().get_dataset("auth", "foo")
 
         second_call = mock_request.mock_calls[0]
         second_trace = second_call[2]["headers"]["X-B3-TraceId"]
