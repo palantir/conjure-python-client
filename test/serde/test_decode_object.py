@@ -11,12 +11,42 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Dict, List
 
 import pytest
 import re
-from conjure_python_client import ConjureDecoder
+from conjure_python_client import ConjureDecoder, ConjureBeanType, ConjureFieldDefinition
 from test.example_service.product import CreateDatasetRequest
-from test.example_service.product.datasets import ListExample, MapExample
+
+
+class ListExample(ConjureBeanType):
+    @classmethod
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+        return {"value": ConjureFieldDefinition("value", List[str])}
+
+    _value: List[str] = None
+
+    def __init__(self, value: List[str]) -> None:
+        self._value = value
+
+    @property
+    def value(self) -> List[str]:
+        return self._value
+
+
+class MapExample(ConjureBeanType):
+    @classmethod
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+        return {"value": ConjureFieldDefinition("value", Dict[str, str])}
+
+    _value: Dict[str, str] = None
+
+    def __init__(self, value: Dict[str, str]) -> None:
+        self._value = value
+
+    @property
+    def value(self) -> Dict[str, str]:
+        return self._value
 
 
 def test_object_decodes_when_exact_fields_are_present():
