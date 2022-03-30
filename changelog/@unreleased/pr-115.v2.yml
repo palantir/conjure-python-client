@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Update checked in client to use conjure-python 4.x. Delete old type
+    markers that are no longer used and were deprecated in 2.x
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/115
