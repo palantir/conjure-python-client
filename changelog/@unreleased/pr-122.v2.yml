@@ -1,4 +1,4 @@
-type: improvement
+type: break
 break:
   description: Add license information to metadata so it shows up in pypi and pip
   links:
