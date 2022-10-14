@@ -14,6 +14,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+import requests
+
 
 @dataclass
 class SslConfiguration:
@@ -24,6 +26,7 @@ class SslConfiguration:
 class ServiceConfiguration:
     api_token: Optional[str] = None
     security: Optional[SslConfiguration] = None
+    session: Optional[requests.Session] = None
     uris: List[str] = field(default_factory=list)
     connect_timeout: float = 10
     read_timeout: float = 300

@@ -79,12 +79,12 @@ setup(
     # The project's main homepage.
     url="https://github.com/palantir/conjure-python-client",
     author="Palantir Technologies, Inc.",
-    classifiers=[ 
+    classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10"
+        "Programming Language :: Python :: 3.10",
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
