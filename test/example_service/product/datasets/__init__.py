@@ -129,7 +129,7 @@ class EnumExample(ConjureEnumType):
 
 class EnumFieldExample(ConjureBeanType):
 
-    @builtins.classmethod
+    @classmethod
     def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
         return {
             'enum': ConjureFieldDefinition('enum', EnumExample)
@@ -140,6 +140,6 @@ class EnumFieldExample(ConjureBeanType):
     def __init__(self, enum: "EnumExample") -> None:
         self._enum = enum
 
-    @builtins.property
+    @property
     def enum(self) -> "EnumExample":
         return self._enum
