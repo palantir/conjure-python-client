@@ -110,3 +110,36 @@ class MapExample(ConjureBeanType):
     @property
     def value(self) -> Dict[str, str]:
         return self._value
+
+
+class EnumExample(ConjureEnumType):
+
+    ONE = 'ONE'
+    '''ONE'''
+    TWO = 'TWO'
+    '''TWO'''
+    ONE_HUNDRED = 'ONE_HUNDRED'
+    '''ONE_HUNDRED'''
+    UNKNOWN = 'UNKNOWN'
+    '''UNKNOWN'''
+
+    def __reduce_ex__(self, proto):
+        return self.__class__, (self.name,)
+
+
+class EnumFieldExample(ConjureBeanType):
+
+    @builtins.classmethod
+    def _fields(cls) -> Dict[str, ConjureFieldDefinition]:
+        return {
+            'enum': ConjureFieldDefinition('enum', EnumExample)
+        }
+
+    __slots__: List[str] = ['_enum']
+
+    def __init__(self, enum: "EnumExample") -> None:
+        self._enum = enum
+
+    @builtins.property
+    def enum(self) -> "EnumExample":
+        return self._enum
