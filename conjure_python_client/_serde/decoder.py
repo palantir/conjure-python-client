@@ -43,7 +43,8 @@ class ConjureDecoder(object):
             obj: the json object to decode
             conjure_type: a class object which is the bean type
                 we're decoding into
-            allow_hyphens: whether or not to allow hyphens when looking for fields in the obj
+            allow_hyphens: whether or not to allow hyphens when looking
+                for fields in the obj
         Returns:
             A instance of a bean of type conjure_type.
         """
@@ -59,9 +60,11 @@ class ConjureDecoder(object):
             ]
 
             if allow_hyphens:
-                field_candidates.append(cls.convert_field_to_hyphenated(python_arg_name))
+                field_candidates.append(
+                    cls.convert_field_to_hyphenated(python_arg_name))
 
-            result, field, value = cls.attempt_field_extraction(obj, field_candidates)
+            result, field, value = cls.attempt_field_extraction(
+                obj, field_candidates)
 
             if result is None or value is None:
                 cls.check_null_field(
@@ -75,14 +78,18 @@ class ConjureDecoder(object):
         return conjure_type(**deserialized)
 
     @classmethod
-    def attempt_field_extraction(cls, obj, field_candidates) -> Tuple[bool, str, Any]:
+    def attempt_field_extraction(
+            cls, obj, field_candidates) -> Tuple[bool, str, Any]:
         """
-        Checks to see if any given fields (candidates) exist in the given object. Returns only the first
-        one that matches, silently ignores the rest. If a candidate matches, but the value is none, it will return
-        the candidate that matched as the field, and None as the value. If no candidates are found, returns None.
+        Checks to see if any given fields (candidates) exist in the given
+        object. Returns only the first one that matches, silently ignores
+        the rest. If a candidate matches, but the value is none, it will
+        return the candidate that matched as the field, and None as the value.
+        If no candidates are found, returns None.
         Args:
             obj: the json object to decode
-            field_candidates: the candidates that we are looking for in the obj
+            field_candidates: the candidates that we are looking for
+                in the obj
         Returns:
             Tuple(
                 bool, - whether a candidate was found
