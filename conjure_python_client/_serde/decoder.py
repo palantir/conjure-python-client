@@ -24,7 +24,7 @@ from .._lib import (
     OptionalType,
 )
 from typing import Optional, Type, Union, get_origin, get_args
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 import inspect
 import json
 
