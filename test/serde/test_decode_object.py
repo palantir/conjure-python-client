@@ -75,3 +75,8 @@ def test_object_with_null_field_fails():
         ConjureDecoder().read_from_string(
             """{"fileSystemId": null, "path": "bar"}""", CreateDatasetRequest
         )
+
+
+def test_object_with_hyphen():
+    decoded = ConjureDecoder().decode({"file-system-id": "foo", "path": "bar"}, CreateDatasetRequest)
+    assert decoded == CreateDatasetRequest("foo", "bar")

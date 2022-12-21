@@ -35,7 +35,7 @@ class ConjureDecoder(object):
     """Decodes json into a conjure object"""
 
     @classmethod
-    def decode_conjure_bean_type(cls, obj, conjure_type):
+    def decode_conjure_bean_type(cls, obj, conjure_type, allow_hyphens=False):
         """Decodes json into a conjure bean type (a plain bean, not enum
         or union).
 
@@ -43,6 +43,7 @@ class ConjureDecoder(object):
             obj: the json object to decode
             conjure_type: a class object which is the bean type
                 we're decoding into
+            allow_hyphens: whether or not to allow hyphens when looking for fields in the obj
         Returns:
             A instance of a bean of type conjure_type.
         """
@@ -51,19 +52,58 @@ class ConjureDecoder(object):
             python_arg_name,
             field_definition,
         ) in conjure_type._fields().items():
-            field_identifier = field_definition.identifier
 
-            if field_identifier not in obj or obj[field_identifier] is None:
+            field_candidates = [
+                python_arg_name,
+                field_definition.identifier
+            ]
+
+            if allow_hyphens:
+                field_candidates.append(cls.convert_field_to_hyphenated(python_arg_name))
+
+            result, field, value = cls.attempt_field_extraction(obj, field_candidates)
+
+            if result is None or value is None:
                 cls.check_null_field(
                     obj, deserialized, python_arg_name, field_definition
                 )
             else:
-                value = obj[field_identifier]
                 field_type = field_definition.field_type
                 deserialized[python_arg_name] = cls.do_decode(
                     value, field_type
                 )
         return conjure_type(**deserialized)
+
+    @classmethod
+    def attempt_field_extraction(cls, obj, field_candidates) -> Tuple[bool, str, Any]:
+        """
+        Checks to see if any given fields (candidates) exist in the given object. Returns only the first
+        one that matches, silently ignores the rest. If a candidate matches, but the value is none, it will return
+        the candidate that matched as the field, and None as the value. If no candidates are found, returns None.
+        Args:
+            obj: the json object to decode
+            field_candidates: the candidates that we are looking for in the obj
+        Returns:
+            Tuple(
+                bool, - whether a candidate was found
+                str,  - the candidate that matched (if any)
+                Any   - the value for the matched candidate (if any)
+            )
+        """
+
+        for candidate in field_candidates:
+            if candidate in obj:
+                return True, candidate, obj[candidate]
+
+        return False, None, None
+
+    @staticmethod
+    def convert_field_from_hyphenated(field_identifier):
+        return field_identifier.replace("-", "_")
+
+    @staticmethod
+    def convert_field_to_hyphenated(field_identifier):
+        return field_identifier.replace("_", "-")
 
     @classmethod
     def check_null_field(
