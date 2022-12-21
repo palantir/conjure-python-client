@@ -66,7 +66,7 @@ class ConjureDecoder(object):
             result, field, value = cls.attempt_field_extraction(
                 obj, field_candidates)
 
-            if result is None or value is None:
+            if result is False or value is None:
                 cls.check_null_field(
                     obj, deserialized, python_arg_name, field_definition
                 )
@@ -87,7 +87,7 @@ class ConjureDecoder(object):
         object. Returns only the first one that matches, silently ignores
         the rest. If a candidate matches, but the value is none, it will
         return the candidate that matched as the field, and None as the value.
-        If no candidates are found, returns None.
+        If no candidates are found, returns (False, None, None)
         Args:
             obj: the json object to decode
             field_candidates: the candidates that we are looking for
