@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .decoder import ConjureDecoder
+from .decoder import ConjureDecoder, DecodingOptions
 from .encoder import ConjureEncoder
 
 
 __all__ = [
     "ConjureDecoder",
+    "DecodingOptions",
     "ConjureEncoder",
 ]

@@ -25,17 +25,46 @@ from .._lib import (
 )
 from typing import Optional, Type, Union, get_origin, get_args
 from typing import Dict, Any, List, Tuple
+from dataclasses import dataclass
 import inspect
 import json
 
 NoneType = type(None)
 
 
+@dataclass
+class DecodingOptions(object):
+    """
+    A set of options allowed to be inputted by the user to tweak the
+     behavior of the decoder - i.e. An interface for usage. This is invoked on
+     a per class-method instantiation of the class - meaning all configuraable
+     inputs must have a default value specified at compile time. These options
+     are application-specific, and persist throughout the recursion as the
+     decoder dispatches more method stacks in memory.
+
+    Attributes:
+        allow_hyphen (int): This controls whether or not you would prefer to
+            allow users to input "hyphenated" versions of field names.
+            e.g. "foo-bar: "baz" turns into Foo(foobar: baz) instead of
+            considering it an invalid key. The default behavior is false.
+    """
+
+    allow_hyphen: bool = False
+
+    def __post_init__(self):
+        if self.allow_hyphen is None:
+            self.allow_hyphen = False
+
+
 class ConjureDecoder(object):
     """Decodes json into a conjure object"""
 
     @classmethod
-    def decode_conjure_bean_type(cls, obj, conjure_type, allow_hyphens=False):
+    def decode_conjure_bean_type(
+            cls,
+            obj,
+            conjure_type,
+            decoding_options: DecodingOptions = DecodingOptions()):
         """Decodes json into a conjure bean type (a plain bean, not enum
         or union).
 
@@ -43,25 +72,24 @@ class ConjureDecoder(object):
             obj: the json object to decode
             conjure_type: a class object which is the bean type
                 we're decoding into
-            allow_hyphens: whether or not to allow hyphens when looking
-                for fields in the obj
+            decoding_options: additional decoding options -
+                see DecodingOptions
         Returns:
             A instance of a bean of type conjure_type.
         """
         deserialized: Dict[str, Any] = {}
         for (
-            python_arg_name,
-            field_definition,
+                python_arg_name,
+                field_definition,
         ) in conjure_type._fields().items():
 
-            field_candidates = [
-                python_arg_name,
-                field_definition.identifier
-            ]
+            field_candidates = [field_definition.identifier]
 
-            if allow_hyphens:
-                field_candidates.append(
-                    cls.convert_field_to_hyphenated(python_arg_name))
+            if decoding_options.allow_hyphen:
+                field_candidates += [
+                    python_arg_name,
+                    cls.convert_field_to_hyphenated(python_arg_name)
+                ]
 
             result, field, value = cls.attempt_field_extraction(
                 obj, field_candidates)
@@ -73,7 +101,7 @@ class ConjureDecoder(object):
             else:
                 field_type = field_definition.field_type
                 deserialized[python_arg_name] = cls.do_decode(
-                    value, field_type
+                    value, field_type, decoding_options
                 )
         return conjure_type(**deserialized)
 
@@ -116,7 +144,7 @@ class ConjureDecoder(object):
 
     @classmethod
     def check_null_field(
-        cls, obj, deserialized, python_arg_name, field_definition
+            cls, obj, deserialized, python_arg_name, field_definition
     ):
         type_origin = get_origin(field_definition.field_type)
         if isinstance(field_definition.field_type, ListType):
@@ -139,13 +167,19 @@ class ConjureDecoder(object):
             )
 
     @classmethod
-    def decode_conjure_union_type(cls, obj, conjure_type):
+    def decode_conjure_union_type(
+            cls,
+            obj,
+            conjure_type,
+            decoding_options: DecodingOptions = DecodingOptions()):
         """Decodes json into a conjure union type.
 
         Args:
             obj: the json object to decode
             conjure_type: a class object which is the union type
                 we're decoding into
+            decoding_options: additional decoding options -
+                see DecodingOptions
         Returns:
             An instance of type conjure_type.
         """
@@ -170,11 +204,15 @@ class ConjureDecoder(object):
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
-            deserialized[attribute] = cls.do_decode(value, field_type)
+            deserialized[attribute] = cls.do_decode(
+                value, field_type, decoding_options)
         return conjure_type(**deserialized)
 
     @classmethod
-    def decode_conjure_enum_type(cls, obj, conjure_type):
+    def decode_conjure_enum_type(
+            cls,
+            obj,
+            conjure_type):
         """Decodes json into a conjure enum type.
 
         Args:
@@ -199,10 +237,11 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_dict(
-        cls,
-        obj: Dict[Any, Any],
-        key_type: Type[DecodableType],
-        item_type: Type[DecodableType],
+            cls,
+            obj: Dict[Any, Any],
+            key_type: Type[DecodableType],
+            item_type: Type[DecodableType],
+            decoding_options: DecodingOptions = DecodingOptions()
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -213,6 +252,8 @@ class ConjureDecoder(object):
                 of the keys in this dict
             item_type: a class object which is the conjure type
                 of the values in this dict
+            decoding_options: additional decoding options -
+                see DecodingOptions
         Returns:
             A python dictionary, where the keys are instances of type key_type
             and the values are of type value_type.
@@ -220,19 +261,25 @@ class ConjureDecoder(object):
         if not isinstance(obj, dict):
             raise Exception("expected a python dict")
         if (
-            key_type is str
-            or isinstance(key_type, BinaryType)
-            or key_type is BinaryType
-            or (
+                key_type is str
+                or isinstance(key_type, BinaryType)
+                or key_type is BinaryType
+                or (
                 inspect.isclass(key_type)
                 and issubclass(key_type, ConjureEnumType)
-            )
+                )
         ):
             return dict(
                 (
                     (
-                        cls.do_decode(x[0], key_type),
-                        cls.do_decode(x[1], item_type),
+                        cls.do_decode(
+                            x[0],
+                            key_type,
+                            decoding_options),
+                        cls.do_decode(
+                            x[1],
+                            item_type,
+                            decoding_options),
                     )
                     for x in obj.items()
                 )
@@ -241,8 +288,14 @@ class ConjureDecoder(object):
         return dict(
             (
                 (
-                    cls.do_decode(json.loads(x[0]), key_type),
-                    cls.do_decode(x[1], item_type),
+                    cls.do_decode(
+                        json.loads(x[0]),
+                        key_type,
+                        decoding_options),
+                    cls.do_decode(
+                        x[1],
+                        item_type,
+                        decoding_options),
                 )
                 for x in obj.items()
             )
@@ -250,7 +303,10 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_list(
-        cls, obj: List[Any], element_type: Type[DecodableType]
+            cls,
+            obj: List[Any],
+            element_type: Type[DecodableType],
+            decoding_options: DecodingOptions = DecodingOptions()
     ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
@@ -258,6 +314,8 @@ class ConjureDecoder(object):
             obj: the json object to decode
             element_type: a class object which is the conjure type of
                 the elements in this list.
+            decoding_options: additional decoding options -
+                see DecodingOptions
         Returns:
             A python list where the elements are instances of type
                 element_type.
@@ -265,11 +323,14 @@ class ConjureDecoder(object):
         if not isinstance(obj, list):
             raise Exception("expected a python list")
 
-        return list(map(lambda x: cls.do_decode(x, element_type), obj))
+        return list(map(lambda x: cls.do_decode(
+            x, element_type, decoding_options), obj))
 
     @classmethod
     def decode_optional(
-        cls, obj: Optional[Any], object_type: Type[DecodableType]
+            cls, obj: Optional[Any],
+            object_type: Type[DecodableType],
+            decoding_options: DecodingOptions = DecodingOptions()
     ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
@@ -278,13 +339,17 @@ class ConjureDecoder(object):
             obj: the json object to decode
             object_type: a class object which is the conjure type of
                 the object if present.
+            decoding_options: additional decoding options -
+                see DecodingOptions
         Returns:
             The decoded obj or None if no obj is provided.
         """
         if obj is None:
             return None
 
-        return cls.do_decode(obj, object_type)
+        return cls.do_decode(obj,
+                             object_type,
+                             decoding_options=decoding_options)
 
     @classmethod
     def decode_primitive(cls, obj, object_type):
@@ -298,13 +363,14 @@ class ConjureDecoder(object):
         if object_type is float:
             return float(obj)
         elif (
-            object_type is str
-            or object_type is BinaryType
-            or isinstance(object_type, BinaryType)
+                object_type is str
+                or object_type is BinaryType
+                or isinstance(object_type, BinaryType)
         ):
             # Python 2/3 compatible way of checking string
             if not (
-                isinstance(obj, str) or str(type(obj)) == "<type 'unicode'>"
+                    isinstance(obj, str) or
+                    str(type(obj)) == "<type 'unicode'>"
             ):
                 raise_mismatch()
         elif not isinstance(obj, object_type):
@@ -313,27 +379,39 @@ class ConjureDecoder(object):
         return obj
 
     @classmethod
-    def do_decode(cls, obj: Any, obj_type: Type[DecodableType]) -> Any:
+    def do_decode(
+            cls,
+            obj: Any,
+            obj_type: Type[DecodableType],
+            decoding_options: DecodingOptions = DecodingOptions()
+    ) -> Any:
         """Decodes json into the specified type
 
         Args:
             obj: the json object to decode
             obj_type: a class object which is the type we're decoding into.
+            decoding_options: see DecodingOptions
         """
 
         type_origin = get_origin(obj_type)
         type_args = get_args(obj_type)
 
-        if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType):
-            return cls.decode_conjure_bean_type(obj, obj_type)
+        if (
+                inspect.isclass(obj_type) and
+                issubclass(obj_type, ConjureBeanType)
+        ):
+            return cls.decode_conjure_bean_type(
+                obj,
+                obj_type,
+                decoding_options=decoding_options)
 
         elif inspect.isclass(obj_type) and issubclass(
-            obj_type, ConjureUnionType
+                obj_type, ConjureUnionType
         ):
             return cls.decode_conjure_union_type(obj, obj_type)
 
         elif inspect.isclass(obj_type) and issubclass(
-            obj_type, ConjureEnumType
+                obj_type, ConjureEnumType
         ):
             return cls.decode_conjure_enum_type(obj, obj_type)
 
@@ -358,11 +436,12 @@ class ConjureDecoder(object):
 
         return cls.decode_primitive(obj, obj_type)
 
-    def decode(self, obj: Any, obj_type: Type[DecodableType]) -> Any:
-        return self.do_decode(obj, obj_type)
+    def decode(self, obj: Any, obj_type: Type[DecodableType],
+               decoding_options: DecodingOptions = DecodingOptions()) -> Any:
+        return self.do_decode(obj, obj_type, decoding_options)
 
     def read_from_string(
-        self, string_value: str, obj_type: Type[DecodableType]
+            self, string_value: str, obj_type: Type[DecodableType]
     ) -> Any:
         deserialized = json.loads(string_value)
         return self.decode(deserialized, obj_type)
