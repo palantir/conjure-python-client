@@ -79,7 +79,9 @@ class ConjureDecoder(object):
 
     @classmethod
     def attempt_field_extraction(
-            cls, obj, field_candidates) -> Tuple[bool, str, Any]:
+            cls,
+            obj,
+            field_candidates) -> Tuple[bool, Optional[str], Optional[Any]]:
         """
         Checks to see if any given fields (candidates) exist in the given
         object. Returns only the first one that matches, silently ignores
