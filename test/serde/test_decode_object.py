@@ -14,7 +14,7 @@
 
 import pytest
 import re
-from conjure_python_client import ConjureDecoder
+from conjure_python_client import ConjureDecoder, DecodingOptions
 from test.example_service.product import CreateDatasetRequest
 from test.example_service.product.datasets import ListExample, MapExample
 
@@ -75,3 +75,17 @@ def test_object_with_null_field_fails():
         ConjureDecoder().read_from_string(
             """{"fileSystemId": null, "path": "bar"}""", CreateDatasetRequest
         )
+
+
+def test_object_with_hyphen():
+    decoded = ConjureDecoder().decode(
+        {"file-system-id": "foo", "path": "bar"},
+        CreateDatasetRequest, decoding_options=DecodingOptions(allow_hyphen=True))
+    assert decoded == CreateDatasetRequest("foo", "bar")
+
+
+def test_object_with_hyphen_alternative():
+    with pytest.raises(Exception):
+        ConjureDecoder().decode(
+            {"file-system-id": "foo", "path": "bar"},
+            CreateDatasetRequest, decoding_options=DecodingOptions(allow_hyphen=False))
