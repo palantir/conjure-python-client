@@ -10,7 +10,7 @@ version: 2
 jobs:
   generate-bindings:
     docker:
-      - image: circleci/openjdk:8u171-jdk-node-browsers
+      - image: cimg/openjdk:11.0.10-node
     steps:
       - checkout
 
@@ -27,7 +27,7 @@ jobs:
 
   py27:
     docker:
-      - image: circleci/python:2.7.15
+      - image: cimg/python:2.7.18
     steps:
       - checkout
 
@@ -62,7 +62,7 @@ jobs:
 
   py3:
     docker:
-      - image: circleci/python:3.6.5
+      - image: cimg/python:3.6.15
     steps:
       - checkout
 
@@ -97,7 +97,7 @@ jobs:
 
   mypy27:
     docker:
-      - image: circleci/python:3.6.5
+      - image: cimg/python:3.6.15
     steps:
       - checkout
 
@@ -129,7 +129,7 @@ jobs:
 
   mypy3:
     docker:
-      - image: circleci/python:3.6.5
+      - image: cimg/python:3.6.15
     steps:
       - checkout
 
@@ -161,7 +161,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.6.5
+      - image: cimg/python:3.6.15
     steps:
       - checkout
 
@@ -193,15 +193,14 @@ jobs:
 
   publish-wheel:
     docker:
-      - image: circleci/python:3.6.5
+      - image: cimg/python:3.6.15
     steps:
       - checkout
       - deploy:
           command: |
             pip install --user setuptools wheel twine
             python setup.py sdist bdist_wheel --universal
-            ~/.local/bin/twine upload dist/*
-
+            ~/.local/bin/twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
 workflows:
   version: 2
   build:
