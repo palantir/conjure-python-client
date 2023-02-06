@@ -134,6 +134,7 @@ jobs:
           command: |
             pip install --user setuptools wheel twine
             python setup.py sdist bdist_wheel --universal
+            ~/.local/bin/twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
 
 workflows:
   version: 2
@@ -155,3 +156,6 @@ workflows:
             - py3
             - mypy3
             - lint
+          filters:
+            tags: { only: '/^[0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)*$/' }
+            branches: { ignore: /.*/ }
