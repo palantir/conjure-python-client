@@ -129,11 +129,13 @@ jobs:
       - image: cimg/python:3.6.15
     steps:
       - checkout
+      # building the cryptography wheel requires rust toolchain. See https://cryptography.io/en/3.4.2/installation.html#rust
+      - run: sudo apt-get update && sudo apt-get install rustc cargo
       - deploy:
           command: |
             pip install --user setuptools wheel twine
             python setup.py sdist bdist_wheel --universal
-            ~/.local/bin/twine upload dist/*
+            ~/.local/bin/twine upload --repository-url https://upload.pypi.org/legacy/ -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
 
 workflows:
   version: 2
