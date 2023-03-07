@@ -17,22 +17,27 @@ from os import path, makedirs, system
 import subprocess
 import sys
 
-try:
-    gitversion = subprocess.check_output(
-        'git describe --tags --always --first-parent'.split()
-    ).decode(
-    ).strip(
-    ).replace(
-        '-', '_'
-    )
-    open("conjure_python_client/_version.py", "w").write(
-        '__version__ = "{}"\n'.format(gitversion)
-    )
-    if not path.exists("build"):
-        makedirs("build")
-except subprocess.CalledProcessError:
-    print("outside git repo, not generating new version string")
-exec (open("conjure_python_client/_version.py").read())
+
+VERSION_PY_PATH = "conjure_python_client/_version.py"
+
+
+if not path.exists(VERSION_PY_PATH):
+    try:
+        gitversion = subprocess.check_output(
+            'git describe --tags --always --first-parent'.split()
+        ).decode(
+        ).strip(
+        ).replace(
+            '-', '_'
+        )
+        open(VERSION_PY_PATH, "w").write(
+            '__version__ = "{}"\n'.format(gitversion)
+        )
+        if not path.exists("build"):
+            makedirs("build")
+    except subprocess.CalledProcessError:
+        print("outside git repo, not generating new version string")
+exec (open(VERSION_PY_PATH).read())
 
 
 class FormatCommand(Command):
