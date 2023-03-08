@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Do not overwrite the _version.py file if it already exists
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/140
