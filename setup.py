@@ -37,7 +37,7 @@ if not path.exists(VERSION_PY_PATH):
             makedirs("build")
     except subprocess.CalledProcessError:
         print("outside git repo, not generating new version string")
-    exec(open(VERSION_PY_PATH).read())
+exec(open(VERSION_PY_PATH).read())
 
 
 class FormatCommand(Command):
