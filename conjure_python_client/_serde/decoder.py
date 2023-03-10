@@ -105,7 +105,7 @@ class ConjureDecoder(object):
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
             deserialized[attribute] = cls.do_decode(value, field_type)
-        return conjure_type(**deserialized)
+        return conjure_type(**deserialized, type_of_union=type_of_union)
 
     @classmethod
     def decode_conjure_enum_type(cls, obj, conjure_type):
