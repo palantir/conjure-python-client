@@ -125,7 +125,7 @@ class ConjureDecoder(object):
 
         # for backwards compatibility with conjure-python,
         # only pass in arg type_of_union if it is expected
-        if 'type_of_union' in conjure_type.__code__.co_varnames:
+        if 'type_of_union' in inspect.signature(conjure_type.__init__).parameters:
             deserialized['type_of_union'] = type_of_union
         return conjure_type(**deserialized)
 
