@@ -1,5 +1,5 @@
 type: fix
 fix:
-  description: Pass in type_of_union to the constructor when decoding a union type. Relevant PR to conjure-python: https://github.com/palantir/conjure-python/pull/681
+  description: Pass in type_of_union to the constructor when decoding a union type
   links:
   - https://github.com/palantir/conjure-python-client/pull/142
