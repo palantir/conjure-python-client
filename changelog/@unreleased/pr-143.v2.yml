@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Use correct constructor signature of conjure type to determine if type_of_union is a parameter
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/143
