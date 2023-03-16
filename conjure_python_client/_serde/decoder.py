@@ -105,6 +105,12 @@ class ConjureDecoder(object):
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
             deserialized[attribute] = cls.do_decode(value, field_type)
+
+        # for backwards compatibility with conjure-python,
+        # only pass in type_of_union if it is expected
+        param_dict = inspect.signature(conjure_type.__init__).parameters
+        if 'type_of_union' in param_dict:
+            deserialized['type_of_union'] = type_of_union
         return conjure_type(**deserialized)
 
     @classmethod
