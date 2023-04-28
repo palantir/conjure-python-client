@@ -65,16 +65,26 @@ class Service(object):
     _connect_timeout = None  # type: float
     _read_timeout = None  # type: float
     _verify = None  # type: str
+    _return_none_for_unknown_union_types = False  # type: bool
 
     def __init__(
-        self, requests_session, uris, _connect_timeout, _read_timeout, _verify
+        self,
+        requests_session,
+        uris,
+        _connect_timeout,
+        _read_timeout,
+        _verify,
+        _return_none_for_unknown_union_types=False
     ):
-        # type: (requests.Session, List[str], float, float, str) -> None
+        # type: (requests.Session, List[str], float, float, str, bool) -> None
         self._requests_session = requests_session
         self._uris = uris
         self._connect_timeout = _connect_timeout
         self._read_timeout = _read_timeout
         self._verify = _verify
+        self._return_none_for_unknown_union_types = (
+            _return_none_for_unknown_union_types
+        )
 
     @property
     def _uri(self):
@@ -156,8 +166,14 @@ class RetryWithJitter(Retry):
 class RequestsClient(object):
 
     @classmethod
-    def create(cls, service_class, user_agent, service_config):
-        # type: (Type[T], str, ServiceConfiguration) -> T
+    def create(
+            cls,
+            service_class,
+            user_agent,
+            service_config,
+            return_none_for_unknown_union_types=False
+    ):
+        # type: (Type[T], str, ServiceConfiguration, bool) -> T
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
         retry = RetryWithJitter(
@@ -182,6 +198,7 @@ class RequestsClient(object):
             service_config.connect_timeout,
             service_config.read_timeout,
             verify,
+            return_none_for_unknown_union_types,
         )
 
 
