@@ -63,6 +63,7 @@ class Service(object):
     _connect_timeout: float
     _read_timeout: float
     _verify: str
+    _return_none_for_unknown_union_types: bool
 
     def __init__(
         self,
@@ -71,12 +72,16 @@ class Service(object):
         _connect_timeout: float,
         _read_timeout: float,
         _verify: str,
+        _return_none_for_unknown_union_types: bool,
     ) -> None:
         self._requests_session = requests_session
         self._uris = uris
         self._connect_timeout = _connect_timeout
         self._read_timeout = _read_timeout
         self._verify = _verify
+        self._return_none_for_unknown_union_types = (
+            _return_none_for_unknown_union_types
+        )
 
     @property
     def _uri(self) -> str:
@@ -158,6 +163,7 @@ class RequestsClient(object):
         service_class: Type[T],
         user_agent: str,
         service_config: ServiceConfiguration,
+        return_none_for_unknown_union_types=False,
     ) -> T:
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
@@ -183,6 +189,7 @@ class RequestsClient(object):
             service_config.connect_timeout,
             service_config.read_timeout,
             verify,
+            return_none_for_unknown_union_types,
         )
 
 
