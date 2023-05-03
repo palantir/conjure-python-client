@@ -163,7 +163,7 @@ class RequestsClient(object):
         service_class: Type[T],
         user_agent: str,
         service_config: ServiceConfiguration,
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> T:
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
