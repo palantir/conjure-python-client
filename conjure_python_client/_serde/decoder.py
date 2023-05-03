@@ -175,7 +175,7 @@ class ConjureDecoder(object):
         obj: Dict[Any, Any],
         key_type: Type[DecodableType],
         item_type: Type[DecodableType],
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -241,7 +241,7 @@ class ConjureDecoder(object):
         cls,
         obj: List[Any],
         element_type: Type[DecodableType],
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
@@ -273,7 +273,7 @@ class ConjureDecoder(object):
         cls,
         obj: Optional[Any],
         object_type: Type[DecodableType],
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
@@ -398,7 +398,7 @@ class ConjureDecoder(object):
         self,
         obj: Any,
         obj_type: Type[DecodableType],
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> Any:
         return self.do_decode(
             obj, obj_type, return_none_for_unknown_union_types
@@ -408,7 +408,7 @@ class ConjureDecoder(object):
         self,
         string_value: str,
         obj_type: Type[DecodableType],
-        return_none_for_unknown_union_types=False,
+        return_none_for_unknown_union_types: bool = False,
     ) -> Any:
         deserialized = json.loads(string_value)
         return self.decode(
