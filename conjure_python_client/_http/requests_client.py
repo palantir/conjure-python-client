@@ -72,7 +72,7 @@ class Service(object):
         _connect_timeout: float,
         _read_timeout: float,
         _verify: str,
-        _return_none_for_unknown_union_types: bool,
+        _return_none_for_unknown_union_types: bool = False,
     ) -> None:
         self._requests_session = requests_session
         self._uris = uris
