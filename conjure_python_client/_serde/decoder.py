@@ -35,7 +35,9 @@ class ConjureDecoder(object):
     """Decodes json into a conjure object"""
 
     @classmethod
-    def decode_conjure_bean_type(cls, obj, conjure_type):
+    def decode_conjure_bean_type(
+        cls, obj, conjure_type, return_none_for_unknown_union_types=False
+    ):
         """Decodes json into a conjure bean type (a plain bean, not enum
         or union).
 
@@ -43,6 +45,9 @@ class ConjureDecoder(object):
             obj: the json object to decode
             conjure_type: a class object which is the bean type
                 we're decoding into
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         Returns:
             A instance of a bean of type conjure_type.
         """
@@ -61,7 +66,7 @@ class ConjureDecoder(object):
                 value = obj[field_identifier]
                 field_type = field_definition.field_type
                 deserialized[python_arg_name] = cls.do_decode(
-                    value, field_type
+                    value, field_type, return_none_for_unknown_union_types
                 )
         return conjure_type(**deserialized)
 
@@ -90,13 +95,18 @@ class ConjureDecoder(object):
             )
 
     @classmethod
-    def decode_conjure_union_type(cls, obj, conjure_type):
+    def decode_conjure_union_type(
+        cls, obj, conjure_type, return_none_for_unknown_union_types=False
+    ):
         """Decodes json into a conjure union type.
 
         Args:
             obj: the json object to decode
             conjure_type: a class object which is the union type
                 we're decoding into
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         Returns:
             An instance of type conjure_type.
         """
@@ -107,11 +117,14 @@ class ConjureDecoder(object):
                 conjure_field_definition = conjure_field
                 break
         else:
-            raise ValueError(
-                "unknown union type {0} for {1}".format(
-                    type_of_union, conjure_type
+            if return_none_for_unknown_union_types:
+                return None
+            else:
+                raise ValueError(
+                    "unknown union type {0} for {1}".format(
+                        type_of_union, conjure_type
+                    )
                 )
-            )
 
         deserialized: Dict[str, Any] = {}
         if type_of_union not in obj or obj[type_of_union] is None:
@@ -121,7 +134,9 @@ class ConjureDecoder(object):
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
-            deserialized[attribute] = cls.do_decode(value, field_type)
+            deserialized[attribute] = cls.do_decode(
+                value, field_type, return_none_for_unknown_union_types
+            )
 
         # for backwards compatibility with conjure-python,
         # only pass in arg type_of_union if it is expected
@@ -160,6 +175,7 @@ class ConjureDecoder(object):
         obj: Dict[Any, Any],
         key_type: Type[DecodableType],
         item_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
     ) -> Dict[Any, Any]:
         """Decodes json into a dictionary, handling conversion of the
         keys/values (the keys/values may themselves require conversion).
@@ -170,6 +186,9 @@ class ConjureDecoder(object):
                 of the keys in this dict
             item_type: a class object which is the conjure type
                 of the values in this dict
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         Returns:
             A python dictionary, where the keys are instances of type key_type
             and the values are of type value_type.
@@ -188,8 +207,14 @@ class ConjureDecoder(object):
             return dict(
                 (
                     (
-                        cls.do_decode(x[0], key_type),
-                        cls.do_decode(x[1], item_type),
+                        cls.do_decode(
+                            x[0], key_type, return_none_for_unknown_union_types
+                        ),
+                        cls.do_decode(
+                            x[1],
+                            item_type,
+                            return_none_for_unknown_union_types,
+                        ),
                     )
                     for x in obj.items()
                 )
@@ -198,8 +223,14 @@ class ConjureDecoder(object):
         return dict(
             (
                 (
-                    cls.do_decode(json.loads(x[0]), key_type),
-                    cls.do_decode(x[1], item_type),
+                    cls.do_decode(
+                        json.loads(x[0]),
+                        key_type,
+                        return_none_for_unknown_union_types,
+                    ),
+                    cls.do_decode(
+                        x[1], item_type, return_none_for_unknown_union_types
+                    ),
                 )
                 for x in obj.items()
             )
@@ -207,7 +238,10 @@ class ConjureDecoder(object):
 
     @classmethod
     def decode_list(
-        cls, obj: List[Any], element_type: Type[DecodableType]
+        cls,
+        obj: List[Any],
+        element_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
     ) -> List[Any]:
         """Decodes json into a list, handling conversion of the elements.
 
@@ -215,6 +249,9 @@ class ConjureDecoder(object):
             obj: the json object to decode
             element_type: a class object which is the conjure type of
                 the elements in this list.
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         Returns:
             A python list where the elements are instances of type
                 element_type.
@@ -222,11 +259,21 @@ class ConjureDecoder(object):
         if not isinstance(obj, list):
             raise Exception("expected a python list")
 
-        return list(map(lambda x: cls.do_decode(x, element_type), obj))
+        return list(
+            map(
+                lambda x: cls.do_decode(
+                    x, element_type, return_none_for_unknown_union_types
+                ),
+                obj,
+            )
+        )
 
     @classmethod
     def decode_optional(
-        cls, obj: Optional[Any], object_type: Type[DecodableType]
+        cls,
+        obj: Optional[Any],
+        object_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
     ) -> Optional[Any]:
         """Decodes json into an element, returning None if the provided object
         is None.
@@ -235,13 +282,18 @@ class ConjureDecoder(object):
             obj: the json object to decode
             object_type: a class object which is the conjure type of
                 the object if present.
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         Returns:
             The decoded obj or None if no obj is provided.
         """
         if obj is None:
             return None
 
-        return cls.do_decode(obj, object_type)
+        return cls.do_decode(
+            obj, object_type, return_none_for_unknown_union_types
+        )
 
     @classmethod
     def decode_primitive(cls, obj, object_type):
@@ -270,24 +322,36 @@ class ConjureDecoder(object):
         return obj
 
     @classmethod
-    def do_decode(cls, obj: Any, obj_type: Type[DecodableType]) -> Any:
+    def do_decode(
+        cls,
+        obj: Any,
+        obj_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
+    ) -> Any:
         """Decodes json into the specified type
 
         Args:
             obj: the json object to decode
             obj_type: a class object which is the type we're decoding into.
+            return_none_for_unknown_union_types: if set to True, returns None
+                instead of raising an exception when an unknown union type is
+                encountered
         """
 
         type_origin = get_origin(obj_type)
         type_args = get_args(obj_type)
 
         if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType):
-            return cls.decode_conjure_bean_type(obj, obj_type)
+            return cls.decode_conjure_bean_type(
+                obj, obj_type, return_none_for_unknown_union_types
+            )
 
         elif inspect.isclass(obj_type) and issubclass(
             obj_type, ConjureUnionType
         ):
-            return cls.decode_conjure_union_type(obj, obj_type)
+            return cls.decode_conjure_union_type(
+                obj, obj_type, return_none_for_unknown_union_types
+            )
 
         elif inspect.isclass(obj_type) and issubclass(
             obj_type, ConjureEnumType
@@ -295,31 +359,58 @@ class ConjureDecoder(object):
             return cls.decode_conjure_enum_type(obj, obj_type)
 
         elif isinstance(obj_type, DictType):
-            return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
+            return cls.decode_dict(
+                obj,
+                obj_type.key_type,
+                obj_type.value_type,
+                return_none_for_unknown_union_types,
+            )
 
         elif isinstance(obj_type, ListType):
-            return cls.decode_list(obj, obj_type.item_type)
+            return cls.decode_list(
+                obj, obj_type.item_type, return_none_for_unknown_union_types
+            )
 
         elif isinstance(obj_type, OptionalType):
-            return cls.decode_optional(obj, obj_type.item_type)
+            return cls.decode_optional(
+                obj, obj_type.item_type, return_none_for_unknown_union_types
+            )
 
         elif type_origin is OptionalTypeWrapper:
-            return cls.decode_optional(obj, type_args[0])
+            return cls.decode_optional(
+                obj, type_args[0], return_none_for_unknown_union_types
+            )
 
         elif type_origin is dict:
             (key_type, value_type) = type_args
-            return cls.decode_dict(obj, key_type, value_type)
+            return cls.decode_dict(
+                obj, key_type, value_type, return_none_for_unknown_union_types
+            )
 
         elif type_origin is list:
-            return cls.decode_list(obj, type_args[0])
+            return cls.decode_list(
+                obj, type_args[0], return_none_for_unknown_union_types
+            )
 
         return cls.decode_primitive(obj, obj_type)
 
-    def decode(self, obj: Any, obj_type: Type[DecodableType]) -> Any:
-        return self.do_decode(obj, obj_type)
+    def decode(
+        self,
+        obj: Any,
+        obj_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
+    ) -> Any:
+        return self.do_decode(
+            obj, obj_type, return_none_for_unknown_union_types
+        )
 
     def read_from_string(
-        self, string_value: str, obj_type: Type[DecodableType]
+        self,
+        string_value: str,
+        obj_type: Type[DecodableType],
+        return_none_for_unknown_union_types: bool = False,
     ) -> Any:
         deserialized = json.loads(string_value)
-        return self.decode(deserialized, obj_type)
+        return self.decode(
+            deserialized, obj_type, return_none_for_unknown_union_types
+        )
