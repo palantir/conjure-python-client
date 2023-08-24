@@ -163,8 +163,9 @@ class ConjureDecoder(object):
                 )
             )
 
-        if obj in conjure_type.__members__:
-            return conjure_type[obj]
+        upper_value: str = obj.upper()
+        if upper_value in conjure_type.__members__:
+            return conjure_type[upper_value]
 
         else:
             return conjure_type["UNKNOWN"]
