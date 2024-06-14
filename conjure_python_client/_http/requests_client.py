@@ -174,9 +174,10 @@ class RequestsClient(object):
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
         )
         transport_adapter = TransportAdapter(max_retries=retry)
-        # create a session, for shared connection polling, user agent, etc
-        session = requests.Session()
-        session.headers = CaseInsensitiveDict({"User-Agent": user_agent})
+        # create a session if one was not provided
+        if service_config.session is None:
+            session = requests.Session()
+        session.headers.update(CaseInsensitiveDict({"User-Agent": user_agent}))
         if service_config.security is not None:
             verify = service_config.security.trust_store_path
         else:
