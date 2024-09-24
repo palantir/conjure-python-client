@@ -14,29 +14,59 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup, Command
 from os import path, makedirs, system
+import re
 import subprocess
 import sys
 
 VERSION_PY_PATH = "conjure_python_client/_version.py"
 
+GIT_REGEX_PATTERN = re.compile(
+    r"^"
+    + r"(?P<tag>[0-9]+\.[0-9]+\.[0-9]+)"
+    + r"(-rc(?P<rc>[0-9]+))?"
+    + r"(-(?P<distance>[0-9]+)-g(?P<hash>[a-f0-9]+))?"
+    + r"(\.(?P<dirty>dirty))?"
+    + r"$"
+)
 
-if not path.exists(VERSION_PY_PATH):
-    try:
-        gitversion = (
-            subprocess.check_output(
-                "git describe --tags --always --first-parent".split()
-            )
-            .decode()
-            .strip()
-            .replace("-", "_")
+
+def convert_sls_version_to_python(sls_version: str) -> str:
+    match = GIT_REGEX_PATTERN.match(sls_version)
+    if not match:
+        raise RuntimeError(f"Invalid SLS version {sls_version}")
+
+    python_version = match.group("tag")
+    rc_group = match.group("rc")
+    distance_group = match.group("distance")
+    hash_group = match.group("hash")
+    dirty_group = match.group("dirty")
+
+    if rc_group:
+        python_version += "rc" + rc_group
+    if distance_group:
+        if not hash_group:
+            raise RuntimeError(f"Cannot specify commit distance without hash for version {sls_version}")
+        python_version += "+" + distance_group + ".g" + hash_group
+    if dirty_group:
+        python_version += "." + dirty_group
+    return python_version
+
+
+try:
+    gitversion = (
+        subprocess.check_output(
+            "git describe --tags --always --first-parent".split()
         )
-        open(VERSION_PY_PATH, "w").write(
-            '__version__ = "{}"\n'.format(gitversion)
-        )
-        if not path.exists("build"):
-            makedirs("build")
-    except subprocess.CalledProcessError:
-        print("outside git repo, not generating new version string")
+        .decode()
+        .strip()
+    )
+    open(VERSION_PY_PATH, "w").write(
+        '__version__ = "{}"\n'.format(convert_sls_version_to_python(gitversion))
+    )
+    if not path.exists("build"):
+        makedirs("build")
+except subprocess.CalledProcessError:
+    print("outside git repo, not generating new version string")
 exec(open(VERSION_PY_PATH).read())
 
 
