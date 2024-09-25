@@ -176,7 +176,9 @@ class RequestsClient(object):
             status_forcelist=[308, 429, 503],
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
         )
-        transport_adapter = TransportAdapter(max_retries=retry, enable_keep_alive=enable_keep_alive)
+        transport_adapter = TransportAdapter(
+            max_retries=retry, enable_keep_alive=enable_keep_alive
+        )
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()
         session.headers = CaseInsensitiveDict({"User-Agent": user_agent})
@@ -198,10 +200,10 @@ class RequestsClient(object):
 
 class TransportAdapter(HTTPAdapter):
     """Transport adapter that allows customising ssl things"""
+
     def __init__(self, *args, enable_keep_alive: bool = False, **kwargs):
         self._enable_keep_alive = enable_keep_alive
         super().__init__(*args, **kwargs)
-
 
     def init_poolmanager(
         self, connections, maxsize, block=False, **pool_kwargs
@@ -211,12 +213,24 @@ class TransportAdapter(HTTPAdapter):
         self._pool_block = block
         ssl_context = create_urllib3_context(ciphers=CIPHERS)
         keep_alive_pool_kwargs = {
-            'socket_options':
-                HTTPConnection.default_socket_options + [
-                    (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # Enable keep alive.
-                    (socket.SOL_TCP, socket.TCP_KEEPIDLE, 120),  # After 120s of idle connection, start keepalive probes.
-                    (socket.SOL_TCP, socket.TCP_KEEPINTVL, 120)  # Interval of 120s between individual keepalive probes.
-                ]
+            "socket_options": HTTPConnection.default_socket_options
+            + [
+                (
+                    socket.SOL_SOCKET,
+                    socket.SO_KEEPALIVE,
+                    1,
+                ),  # Enable keep alive.
+                (
+                    socket.SOL_TCP,
+                    socket.TCP_KEEPIDLE,
+                    120,
+                ),  # After 120s of idle connection, start keepalive probes.
+                (
+                    socket.SOL_TCP,
+                    socket.TCP_KEEPINTVL,
+                    120,
+                ),  # Interval of 120s between individual keepalive probes.
+            ]
         }
         if self._enable_keep_alive:
             pool_kwargs = {**pool_kwargs, **keep_alive_pool_kwargs}
@@ -224,7 +238,6 @@ class TransportAdapter(HTTPAdapter):
             num_pools=connections,
             maxsize=maxsize,
             block=block,
-            strict=True,
             ssl_context=ssl_context,
             **pool_kwargs
         )

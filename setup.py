@@ -45,7 +45,9 @@ def convert_sls_version_to_python(sls_version: str) -> str:
         python_version += "rc" + rc_group
     if distance_group:
         if not hash_group:
-            raise RuntimeError(f"Cannot specify commit distance without hash for version {sls_version}")
+            raise RuntimeError(
+                f"Cannot specify commit distance without hash for version {sls_version}"
+            )
         python_version += "+" + distance_group + ".g" + hash_group
     if dirty_group:
         python_version += "." + dirty_group
@@ -61,7 +63,9 @@ try:
         .strip()
     )
     open(VERSION_PY_PATH, "w").write(
-        '__version__ = "{}"\n'.format(convert_sls_version_to_python(gitversion))
+        '__version__ = "{}"\n'.format(
+            convert_sls_version_to_python(gitversion)
+        )
     )
     if not path.exists("build"):
         makedirs("build")
@@ -113,12 +117,12 @@ setup(
     # The project's main homepage.
     url="https://github.com/palantir/conjure-python-client",
     author="Palantir Technologies, Inc.",
-    classifiers=[ 
+    classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10"
+        "Programming Language :: Python :: 3.10",
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
