@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Add flag to enable TCP keepalives
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/161
