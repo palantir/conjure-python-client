@@ -15,6 +15,7 @@
 from requests.adapters import HTTPAdapter, Response, CaseInsensitiveDict
 from typing import TypeVar, Type, List, Optional, Dict, Any, Union
 from requests.exceptions import HTTPError
+from requests.packages.urllib3.connection import HTTPConnection
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
@@ -24,6 +25,7 @@ import binascii
 import os
 import random
 import requests
+import socket
 
 
 T = TypeVar("T")
@@ -164,6 +166,7 @@ class RequestsClient(object):
         user_agent: str,
         service_config: ServiceConfiguration,
         return_none_for_unknown_union_types: bool = False,
+        enable_keep_alive: bool = False,
     ) -> T:
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
@@ -173,7 +176,7 @@ class RequestsClient(object):
             status_forcelist=[308, 429, 503],
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
         )
-        transport_adapter = TransportAdapter(max_retries=retry)
+        transport_adapter = TransportAdapter(max_retries=retry, enable_keep_alive=enable_keep_alive)
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()
         session.headers = CaseInsensitiveDict({"User-Agent": user_agent})
@@ -195,6 +198,10 @@ class RequestsClient(object):
 
 class TransportAdapter(HTTPAdapter):
     """Transport adapter that allows customising ssl things"""
+    def __init__(self, *args, enable_keep_alive: bool = False, **kwargs):
+        self._enable_keep_alive = enable_keep_alive
+        super().__init__(*args, **kwargs)
+
 
     def init_poolmanager(
         self, connections, maxsize, block=False, **pool_kwargs
@@ -203,6 +210,16 @@ class TransportAdapter(HTTPAdapter):
         self._pool_maxsize = maxsize
         self._pool_block = block
         ssl_context = create_urllib3_context(ciphers=CIPHERS)
+        keep_alive_pool_kwargs = {
+            'socket_options':
+                HTTPConnection.default_socket_options + [
+                    (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # Enable keep alive.
+                    (socket.SOL_TCP, socket.TCP_KEEPIDLE, 120),  # After 120s of idle connection, start keepalive probes.
+                    (socket.SOL_TCP, socket.TCP_KEEPINTVL, 120)  # Interval of 120s between individual keepalive probes.
+                ]
+        }
+        if self._enable_keep_alive:
+            pool_kwargs = {**pool_kwargs, **keep_alive_pool_kwargs}
         self.poolmanager = PoolManager(
             num_pools=connections,
             maxsize=maxsize,
