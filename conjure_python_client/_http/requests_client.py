@@ -26,6 +26,7 @@ import os
 import random
 import requests
 import socket
+import sys
 
 
 T = TypeVar("T")
@@ -49,6 +50,24 @@ CIPHERS = (
     "DHE-RSA-AES256-GCM-SHA384"
 )
 
+SOCKET_KEEP_ALIVE = (
+    socket.SOL_SOCKET,
+    socket.SO_KEEPALIVE,
+    1,
+)  # Enable keep alive.
+SOCKET_KEEP_INTVL = (
+    socket.SOL_TCP,
+    socket.TCP_KEEPINTVL,
+    120,
+)  # Interval of 120s between individual keepalive probes.
+KEEP_ALIVE_SOCKET_OPTIONS = [SOCKET_KEEP_ALIVE, SOCKET_KEEP_INTVL]
+if sys.platform != "darwin":
+    SOCKET_KEEP_IDLE = (
+        socket.SOL_TCP,
+        socket.TCP_KEEPIDLE,
+        120,
+    )  # After 120s of idle connection, start keepalive probes.
+    KEEP_ALIVE_SOCKET_OPTIONS.append(SOCKET_KEEP_IDLE)
 
 TRACE_ID_HEADER: str = "X-B3-TraceId"
 TRACE_ID_RANDOM_BYTES = 8
@@ -201,6 +220,8 @@ class RequestsClient(object):
 class TransportAdapter(HTTPAdapter):
     """Transport adapter that allows customising ssl things"""
 
+    __attrs__ = HTTPAdapter.__attrs__ + ["_enable_keep_alive"]
+
     def __init__(self, *args, enable_keep_alive: bool = False, **kwargs):
         self._enable_keep_alive = enable_keep_alive
         super().__init__(*args, **kwargs)
@@ -214,23 +235,7 @@ class TransportAdapter(HTTPAdapter):
         ssl_context = create_urllib3_context(ciphers=CIPHERS)
         keep_alive_pool_kwargs = {
             "socket_options": HTTPConnection.default_socket_options
-            + [
-                (
-                    socket.SOL_SOCKET,
-                    socket.SO_KEEPALIVE,
-                    1,
-                ),  # Enable keep alive.
-                (
-                    socket.SOL_TCP,
-                    socket.TCP_KEEPIDLE,
-                    120,
-                ),  # After 120s of idle connection, start keepalive probes.
-                (
-                    socket.SOL_TCP,
-                    socket.TCP_KEEPINTVL,
-                    120,
-                ),  # Interval of 120s between individual keepalive probes.
-            ]
+            + KEEP_ALIVE_SOCKET_OPTIONS
         }
         if self._enable_keep_alive:
             pool_kwargs = {**pool_kwargs, **keep_alive_pool_kwargs}
