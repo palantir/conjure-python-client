@@ -159,16 +159,13 @@ workflows:
           <<: *always-run
       - publish-wheel:
           requires:
-            - py3
-            - mypy3
-            - lint
+            - circle-all
           filters:
             tags: { only: '/^[0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)*$/' }
             branches: { ignore: /.*/ }
       - circle-all:
           requires:
           - lint
-          - generate-bindings
           - mypy3
           - py3
           filters:
