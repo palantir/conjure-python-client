@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix pytest error and properly configure circle-all
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/162
