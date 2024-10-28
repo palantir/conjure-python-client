@@ -6,7 +6,7 @@
 
 ## Local development
 
-A light-weight HTTP client library.
+A light-weight HTTP client library for conjure.
 
 ### Overview
 
