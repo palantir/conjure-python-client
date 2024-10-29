@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix version issues with conda feedstock
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/164
