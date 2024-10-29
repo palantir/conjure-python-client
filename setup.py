@@ -54,23 +54,24 @@ def convert_sls_version_to_python(sls_version: str) -> str:
     return python_version
 
 
-try:
-    gitversion = (
-        subprocess.check_output(
-            "git describe --tags --always --first-parent".split()
+if not path.exists(VERSION_PY_PATH):
+    try:
+        gitversion = (
+            subprocess.check_output(
+                "git describe --tags --always --first-parent".split()
+            )
+            .decode()
+            .strip()
         )
-        .decode()
-        .strip()
-    )
-    open(VERSION_PY_PATH, "w").write(
-        '__version__ = "{}"\n'.format(
-            convert_sls_version_to_python(gitversion)
+        open(VERSION_PY_PATH, "w").write(
+            '__version__ = "{}"\n'.format(
+                convert_sls_version_to_python(gitversion)
+            )
         )
-    )
-    if not path.exists("build"):
-        makedirs("build")
-except subprocess.CalledProcessError:
-    print("outside git repo, not generating new version string")
+        if not path.exists("build"):
+            makedirs("build")
+    except subprocess.CalledProcessError:
+        print("outside git repo, not generating new version string")
 exec(open(VERSION_PY_PATH).read())
 
 
