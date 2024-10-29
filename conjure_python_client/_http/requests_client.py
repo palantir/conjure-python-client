@@ -219,8 +219,9 @@ class RequestsClient(object):
 
 class TransportAdapter(HTTPAdapter):
     """Transport adapter that allows customising ssl things"""
+    ENABLE_KEEP_ALIVE_ATTR = "_enable_keep_alive"
 
-    __attrs__ = HTTPAdapter.__attrs__ + ["_enable_keep_alive"]
+    __attrs__ = HTTPAdapter.__attrs__ + [ENABLE_KEEP_ALIVE_ATTR]
 
     def __init__(self, *args, enable_keep_alive: bool = False, **kwargs):
         self._enable_keep_alive = enable_keep_alive
@@ -246,6 +247,11 @@ class TransportAdapter(HTTPAdapter):
             ssl_context=ssl_context,
             **pool_kwargs
         )
+
+    def __setstate__(self, state):
+        if self.ENABLE_KEEP_ALIVE_ATTR not in state:
+            state[self.ENABLE_KEEP_ALIVE_ATTR] = False
+        super().__setstate__(state)
 
 
 class ConjureHTTPError(HTTPError):
