@@ -251,7 +251,7 @@ class TransportAdapter(HTTPAdapter):
     def __setstate__(self, state):
         if self.ENABLE_KEEP_ALIVE_ATTR not in state:
             state[self.ENABLE_KEEP_ALIVE_ATTR] = False
-        super().__setstate__(state)
+        super().__setstate__(state)  # type: ignore
 
 
 class ConjureHTTPError(HTTPError):
