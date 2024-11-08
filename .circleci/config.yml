@@ -10,7 +10,7 @@ version: 2
 jobs:
   generate-bindings:
     docker:
-      - image: cimg/openjdk:11.0.10-node
+      - image: cimg/openjdk:17.0.10-node
     steps:
       - checkout
 
