@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Bump conjure python to 4.14.0
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/166
