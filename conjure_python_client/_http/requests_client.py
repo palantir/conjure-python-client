@@ -158,7 +158,8 @@ def _add_trace_id(kwargs: Dict[str, Any]) -> None:
     # Adds the trace ID to the arguments
     if "headers" not in kwargs:
         kwargs["headers"] = {}
-    kwargs["headers"][TRACE_ID_HEADER] = fresh_trace_id()
+    if not kwargs["headers"].get(TRACE_ID_HEADER):
+        kwargs["headers"][TRACE_ID_HEADER] = fresh_trace_id()
 
 
 class RetryWithJitter(Retry):
