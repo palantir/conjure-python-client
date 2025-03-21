@@ -294,16 +294,16 @@ class ConjureHTTPError(HTTPError):
         )
 
     def __copy__(self):
-        """The fact that ConjureHTTPError is a BaseException but its __init__ 
-        has a different signature causes a subtle issue for shallow copying. 
+        """The fact that ConjureHTTPError is a BaseException but its __init__
+        has a different signature causes a subtle issue for shallow copying.
         During copy.copy(), __init__ will be called with args defined by
-        BaseException.__reduce_, which corresponds to default __init__. Since 
-        they're inconsistent, what http_error receives is actually message, 
+        BaseException.__reduce_, which corresponds to default __init__. Since
+        they're inconsistent, what http_error receives is actually message,
         hence an error.
 
-        By defining a __copy__ method, we give instructions to the intepreter 
-        on how to reconstruct a ConjureHTTPError instance. Alternatively, we 
-        could also fix it by changing the _init__ signature of this class. 
+        By defining a __copy__ method, we give instructions to the intepreter
+        on how to reconstruct a ConjureHTTPError instance. Alternatively, we
+        could also fix it by changing the _init__ signature of this class.
         Although cleaner, unfortunately it will be a breaking change.
         """
 
