@@ -2,14 +2,13 @@ import copy
 import pickle
 import sys
 
-from requests.exceptions import HTTPError
-
 from conjure_python_client._http.requests_client import (
     ConjureHTTPError,
     SOCKET_KEEP_ALIVE,
     SOCKET_KEEP_INTVL,
     TransportAdapter,
 )
+from requests.exceptions import HTTPError
 
 if sys.platform != "darwin":
     from conjure_python_client._http.requests_client import SOCKET_KEEP_IDLE
@@ -76,4 +75,5 @@ def test_shallow_copying_conjure_http_error():
     original_error = ConjureHTTPError(http_error)
 
     copied_error = copy.copy(original_error)
+    assert type(original_error) is type(copied_error)
     assert str(original_error) == str(copied_error)
