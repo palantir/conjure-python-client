@@ -1,7 +1,11 @@
+import copy
 import pickle
 import sys
 
+from requests.exceptions import HTTPError
+
 from conjure_python_client._http.requests_client import (
+    ConjureHTTPError,
     SOCKET_KEEP_ALIVE,
     SOCKET_KEEP_INTVL,
     TransportAdapter,
@@ -58,3 +62,18 @@ def test_transport_adapter_can_be_unpickled_from_old_pickle():
     }
     adapter = pickle.loads(pickle.dumps(TransportAdapter()))
     assert adapter._enable_keep_alive is False
+
+def test_shallow_copying_conjure_http_error():
+    class MockResponse:
+        def __init__(self):
+            self.headers = {"X-B3-TraceId": "test"}
+
+        def json(self):
+            return {}
+
+    response = MockResponse()
+    http_error = HTTPError("HTTP 500 Server Error", response=response)
+    original_error = ConjureHTTPError(http_error)
+
+    copied_error = copy.copy(original_error)
+    assert str(original_error) == str(copied_error)
