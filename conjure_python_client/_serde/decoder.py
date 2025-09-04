@@ -89,8 +89,8 @@ class ConjureDecoder(object):
             deserialized[python_arg_name] = {}
         else:
             raise Exception(
-                "field {} not found in object {}".format(
-                    field_definition.identifier, obj
+                "field {} not found in the object".format(
+                    field_definition.identifier
                 )
             )
 
