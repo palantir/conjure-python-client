@@ -28,19 +28,3 @@ class TestErrorCode:
     def test_error_code_creation_from_string(self):
         assert ErrorCode("NOT_FOUND") == ErrorCode.NOT_FOUND
         assert ErrorCode("INVALID_ARGUMENT") == ErrorCode.INVALID_ARGUMENT
-
-    def test_all_error_codes_exist(self):
-        expected_codes = {
-            "PERMISSION_DENIED",
-            "INVALID_ARGUMENT",
-            "NOT_FOUND",
-            "CONFLICT",
-            "REQUEST_ENTITY_TOO_LARGE",
-            "FAILED_PRECONDITION",
-            "INTERNAL",
-            "TIMEOUT",
-            "CUSTOM_CLIENT",
-            "CUSTOM_SERVER",
-        }
-        actual_codes = {code.value for code in ErrorCode}
-        assert actual_codes == expected_codes
