@@ -20,6 +20,7 @@ from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from requests.packages.urllib3.util import Retry
 from .configuration import ServiceConfiguration
+from .errors import ErrorCode
 
 import binascii
 import os
@@ -260,7 +261,7 @@ class ConjureHTTPError(HTTPError):
     attributes extracted from the response."""
 
     _cause: Optional[HTTPError]
-    _error_code: str
+    _error_code: ErrorCode
     _error_name: str
     _error_instance_id: str
     _parameters: Dict[str, str]
