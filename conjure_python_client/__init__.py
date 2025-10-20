@@ -28,6 +28,7 @@ __all__ = [
     "ConjureUnionType",
     "DecodableType",
     "DictType",
+    "ErrorCode",
     "ListType",
     "OptionalType",
     "OptionalTypeWrapper",

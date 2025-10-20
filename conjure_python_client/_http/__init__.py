@@ -14,6 +14,7 @@
 
 from .configuration import SslConfiguration, ServiceConfiguration
 from .requests_client import RequestsClient, Service, ConjureHTTPError
+from .errors import ErrorCode
 
 __all__ = [
     "SslConfiguration",
@@ -21,4 +22,5 @@ __all__ = [
     "RequestsClient",
     "Service",
     "ConjureHTTPError",
+    "ErrorCode",
 ]
