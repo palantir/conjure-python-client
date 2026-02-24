@@ -26,7 +26,6 @@ import os
 import random
 import requests
 import socket
-import sys
 
 
 T = TypeVar("T")
@@ -55,13 +54,15 @@ SOCKET_KEEP_ALIVE = (
     socket.SO_KEEPALIVE,
     1,
 )  # Enable keep alive.
-SOCKET_KEEP_INTVL = (
-    socket.SOL_TCP,
-    socket.TCP_KEEPINTVL,
-    120,
-)  # Interval of 120s between individual keepalive probes.
-KEEP_ALIVE_SOCKET_OPTIONS = [SOCKET_KEEP_ALIVE, SOCKET_KEEP_INTVL]
-if sys.platform != "darwin":
+KEEP_ALIVE_SOCKET_OPTIONS = [SOCKET_KEEP_ALIVE]
+if hasattr(socket, "TCP_KEEPINTVL"):
+    SOCKET_KEEP_INTVL = (
+        socket.SOL_TCP,
+        socket.TCP_KEEPINTVL,
+        120,
+    )  # Interval of 120s between individual keepalive probes.
+    KEEP_ALIVE_SOCKET_OPTIONS.append(SOCKET_KEEP_INTVL)
+if hasattr(socket, "TCP_KEEPIDLE"):
     SOCKET_KEEP_IDLE = (
         socket.SOL_TCP,
         socket.TCP_KEEPIDLE,
