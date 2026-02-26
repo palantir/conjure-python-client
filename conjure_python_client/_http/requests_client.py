@@ -255,6 +255,14 @@ class TransportAdapter(HTTPAdapter):
         super().__setstate__(state)  # type: ignore
 
 
+def _reconstruct_conjure_http_error(cls, state):
+    obj = cls.__new__(cls)
+    args = state.pop("args", ())
+    obj.__dict__.update(state)
+    obj.args = args
+    return obj
+
+
 class ConjureHTTPError(HTTPError):
     """An HTTPError from a Conjure Service with ``SerializableError``
     attributes extracted from the response."""
@@ -295,29 +303,15 @@ class ConjureHTTPError(HTTPError):
         )
 
     def __copy__(self):
-        """The fact that ConjureHTTPError is a BaseException but its __init__
-        has a different signature causes a subtle issue for shallow copying.
-        During copy.copy(), __init__ will be called with args defined by
-        BaseException.__reduce_, which corresponds to default __init__. Since
-        they're inconsistent, what http_error receives is actually message,
-        hence an error.
-
-        By defining a __copy__ method, we give instructions to the intepreter
-        on how to reconstruct a ConjureHTTPError instance. Alternatively, we
-        could also fix it by changing the _init__ signature of this class.
-        Although cleaner, unfortunately it will be a breaking change.
-        """
-
-        # Create a shell object without calling __init__
         new_obj = type(self).__new__(type(self))
-
-        for attr, value in self.__dict__.items():
-            setattr(new_obj, attr, value)
-
-        # Exception args are not actually a part of __dict__...
+        new_obj.__dict__.update(self.__dict__)
         new_obj.args = self.args
-
         return new_obj
+
+    def __reduce__(self):
+        state = self.__dict__.copy()
+        state["args"] = self.args
+        return (_reconstruct_conjure_http_error, (type(self), state))
 
     @property
     def cause(self) -> Optional[HTTPError]:
