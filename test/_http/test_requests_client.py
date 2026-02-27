@@ -77,3 +77,23 @@ def test_shallow_copying_conjure_http_error():
     copied_error = copy.copy(original_error)
     assert type(original_error) is type(copied_error)
     assert str(original_error) == str(copied_error)
+
+
+def test_pickling_conjure_http_error():
+    from requests.models import Response, PreparedRequest
+
+    response = Response()
+    response.status_code = 500
+    response.headers["X-B3-TraceId"] = "test"
+    response._content = b'{"errorCode": "INTERNAL", "errorName": "Default:Internal", "errorInstanceId": "abc", "parameters": {}}'
+    request = PreparedRequest()
+    request.prepare_url("http://example.com", {})
+    request.prepare_method("GET")
+    response.request = request
+
+    http_error = HTTPError("HTTP 500 Server Error", response=response, request=request)
+    original_error = ConjureHTTPError(http_error)
+
+    unpickled_error = pickle.loads(pickle.dumps(original_error))
+    assert type(original_error) is type(unpickled_error)
+    assert str(original_error) == str(unpickled_error)
