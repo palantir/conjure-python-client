@@ -1,16 +1,17 @@
 import copy
 import pickle
-import sys
+import socket
 
 from conjure_python_client._http.requests_client import (
     ConjureHTTPError,
     SOCKET_KEEP_ALIVE,
-    SOCKET_KEEP_INTVL,
     TransportAdapter,
 )
 from requests.exceptions import HTTPError
 
-if sys.platform != "darwin":
+if hasattr(socket, "TCP_KEEPINTVL"):
+    from conjure_python_client._http.requests_client import SOCKET_KEEP_INTVL
+if hasattr(socket, "TCP_KEEPIDLE"):
     from conjure_python_client._http.requests_client import SOCKET_KEEP_IDLE
 
 
@@ -28,8 +29,9 @@ def test_keep_alive_passes_correct_options():
         max_retries=12, enable_keep_alive=True
     ).poolmanager.connection_pool_kw["socket_options"]
     assert SOCKET_KEEP_ALIVE in socket_options
-    assert SOCKET_KEEP_INTVL in socket_options
-    if sys.platform != "darwin":
+    if hasattr(socket, "TCP_KEEPINTVL"):
+        assert SOCKET_KEEP_INTVL in socket_options
+    if hasattr(socket, "TCP_KEEPIDLE"):
         assert SOCKET_KEEP_IDLE in socket_options
 
 
