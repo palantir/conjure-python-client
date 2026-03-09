@@ -16,7 +16,7 @@ import pytest
 import re
 from conjure_python_client import ConjureDecoder
 from test.example_service.product import CreateDatasetRequest
-from test.example_service.product.datasets import ListExample, MapExample
+from test.example_service.product.datasets import EnumExample, EnumFieldExample, ListExample, MapExample
 
 
 def test_object_decodes_when_exact_fields_are_present():
@@ -52,6 +52,16 @@ def test_object_with_map_field_decodes():
 def test_object_with_omitted_map_field_decodes():
     decoded = ConjureDecoder().read_from_string("{}", MapExample)
     assert decoded == MapExample({})
+
+
+def test_object_with_enum_field_decodes():
+    decoded = ConjureDecoder().read_from_string('{"enum": "ONE"}', EnumFieldExample)
+    assert decoded == EnumFieldExample(EnumExample.ONE)
+
+
+def test_object_with_enum_field_decodes_case_insensitive():
+    decoded = ConjureDecoder().read_from_string('{"enum": "one"}', EnumFieldExample)
+    assert decoded == EnumFieldExample(EnumExample.ONE)
 
 
 def test_object_with_missing_field_should_throw_helpful_exception():
