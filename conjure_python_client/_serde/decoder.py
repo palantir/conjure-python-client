@@ -51,6 +51,9 @@ class ConjureDecoder(object):
         Returns:
             A instance of a bean of type conjure_type.
         """
+        if not isinstance(obj, dict):
+            raise ValueError("expected a python dict")
+
         deserialized: Dict[str, Any] = {}
         for (
             python_arg_name,

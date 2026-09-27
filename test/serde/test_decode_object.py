@@ -14,7 +14,7 @@
 
 import pytest
 import re
-from conjure_python_client import ConjureDecoder
+from conjure_python_client import ConjureDecoder, DictType
 from test.example_service.product import CreateDatasetRequest
 from test.example_service.product.datasets import ListExample, MapExample
 
@@ -74,4 +74,18 @@ def test_object_with_null_field_fails():
     with pytest.raises(Exception):
         ConjureDecoder().read_from_string(
             """{"fileSystemId": null, "path": "bar"}""", CreateDatasetRequest
+        )
+
+
+@pytest.mark.parametrize("obj", [[], ["test"], "test", 42, True, None])
+@pytest.mark.parametrize("conjure_type", [ListExample, MapExample])
+def test_object_rejects_non_object_input(obj, conjure_type):
+    with pytest.raises(ValueError, match="expected a python dict"):
+        ConjureDecoder().decode(obj, conjure_type)
+
+
+def test_nested_object_rejects_array_input():
+    with pytest.raises(ValueError, match="expected a python dict"):
+        ConjureDecoder().decode(
+            {"steps": ["test"]}, DictType(str, ListExample)
         )
