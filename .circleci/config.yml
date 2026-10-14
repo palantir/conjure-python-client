@@ -6,7 +6,7 @@ palantir_aliases:
       tags:
         only: /.*/
 
-version: 2
+version: 2.1
 jobs:
   generate-bindings:
     docker:
@@ -129,7 +129,7 @@ jobs:
       - image: cimg/python:3.9.21
     steps:
       - checkout
-      - deploy:
+      - run:
           command: |
             pip install --user setuptools wheel twine
             python setup.py sdist bdist_wheel --universal
@@ -143,7 +143,6 @@ jobs:
           command: echo "All required jobs finished successfully"
 
 workflows:
-  version: 2
   build:
     jobs:
       - generate-bindings:
