@@ -11,7 +11,7 @@ from requests.exceptions import HTTPError
 
 if hasattr(socket, "TCP_KEEPINTVL"):
     from conjure_python_client._http.requests_client import SOCKET_KEEP_INTVL
-if hasattr(socket, "TCP_KEEPIDLE"):
+if hasattr(socket, "TCP_KEEPIDLE") or hasattr(socket, "TCP_KEEPALIVE"):
     from conjure_python_client._http.requests_client import SOCKET_KEEP_IDLE
 
 
@@ -31,8 +31,29 @@ def test_keep_alive_passes_correct_options():
     assert SOCKET_KEEP_ALIVE in socket_options
     if hasattr(socket, "TCP_KEEPINTVL"):
         assert SOCKET_KEEP_INTVL in socket_options
-    if hasattr(socket, "TCP_KEEPIDLE"):
+    if hasattr(socket, "TCP_KEEPIDLE") or hasattr(socket, "TCP_KEEPALIVE"):
         assert SOCKET_KEEP_IDLE in socket_options
+
+
+def test_keep_alive_sets_idle_time_on_connected_socket():
+    if hasattr(socket, "TCP_KEEPIDLE"):
+        idle_option = socket.TCP_KEEPIDLE
+    elif hasattr(socket, "TCP_KEEPALIVE"):
+        idle_option = socket.TCP_KEEPALIVE
+    else:
+        return
+
+    with socket.create_server(("127.0.0.1", 0)) as server:
+        port = server.getsockname()[1]
+        url = "http://127.0.0.1:{}".format(port)
+        adapter = TransportAdapter(enable_keep_alive=True)
+        connection = adapter.poolmanager.connection_from_url(url)._new_conn()
+        connection.connect()
+        try:
+            assert connection.sock.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+            assert connection.sock.getsockopt(socket.IPPROTO_TCP, idle_option) == 120
+        finally:
+            connection.close()
 
 
 def test_keep_alive_passed_in_state_in_transport_adapter():
