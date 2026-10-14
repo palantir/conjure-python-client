@@ -74,7 +74,7 @@ elif hasattr(socket, "TCP_KEEPALIVE"):
     # for the system default (2 hours) before it sends the first probe.
     SOCKET_KEEP_IDLE = (
         socket.IPPROTO_TCP,
-        socket.TCP_KEEPALIVE,
+        socket.TCP_KEEPALIVE,  # type: ignore[attr-defined]
         120,
     )  # After 120s of idle connection, start keepalive probes.
     KEEP_ALIVE_SOCKET_OPTIONS.append(SOCKET_KEEP_IDLE)
