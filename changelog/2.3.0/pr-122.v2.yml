@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Add license information to metadata so it shows up in pypi and pip
-  links:
-  - https://github.com/palantir/conjure-python-client/pull/122
