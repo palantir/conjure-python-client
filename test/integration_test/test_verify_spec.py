@@ -143,7 +143,9 @@ def test_header(
     run_test(
         True,
         is_blacklisted,
-        lambda: getattr(header_service, method_name)(json.loads(value), index),
+        lambda: getattr(header_service, method_name)(
+            header=json.loads(value), index=index
+        ),
     )
 
 
