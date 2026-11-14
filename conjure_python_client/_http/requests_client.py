@@ -198,10 +198,17 @@ class RequestsClient(object):
         return_none_for_unknown_union_types: bool = False,
         enable_keep_alive: bool = False,
     ) -> T:
+        uris = service_config.uris
+        mesh_mode = any(uri.startswith("mesh-") for uri in uris)
+        if mesh_mode:
+            if len(uris) != 1:
+                raise ValueError("mesh mode expects exactly one URI")
+            uris = [uris[0].replace("mesh-", "", 1)]
+
         # setup retry to match java remoting
         # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
         retry = RetryWithJitter(
-            total=service_config.max_num_retries,
+            total=0 if mesh_mode else service_config.max_num_retries,
             read=0,  # do not retry read errors
             status_forcelist=[308, 429, 503],
             backoff_factor=float(service_config.backoff_slot_size) / 1000,
@@ -216,11 +223,11 @@ class RequestsClient(object):
             verify = service_config.security.trust_store_path
         else:
             verify = None
-        for uri in service_config.uris:
+        for uri in uris:
             session.mount(uri, transport_adapter)
         return service_class(  # type: ignore
             session,
-            service_config.uris,
+            uris,
             service_config.connect_timeout,
             service_config.read_timeout,
             verify,
