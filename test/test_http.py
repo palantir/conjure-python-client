@@ -103,6 +103,48 @@ class TestHttpRemoting(object):
         assert e.match("Content that's not JSON")
 
     @mock.patch("requests.Session.request")
+    def test_http_error_not_json_has_no_error_fields(self, mock_request):
+        resp = requests.Response()
+        resp.status_code = 404
+        resp._content = b"Content that's not JSON"
+        http_error = HTTPError("something", response=resp)
+        mock_request.return_value = self._mock_response(
+            status=404, raise_for_status=http_error
+        )
+
+        with pytest.raises(ConjureHTTPError) as e:
+            self._test_service().testEndpoint("foo")
+        assert e.value.error_code is None
+        assert e.value.error_name is None
+        assert e.value.error_instance_id is None
+        assert e.value.parameters == {}
+
+    @pytest.mark.parametrize(
+        "body", [b'"Bad Gateway"', b'["Bad Gateway"]', b"null", b"502"]
+    )
+    @mock.patch("requests.Session.request")
+    def test_http_error_json_but_not_an_object(self, mock_request, body):
+        resp = requests.Response()
+        resp.status_code = 502
+        resp._content = body
+        http_error = HTTPError("mocked http error", response=resp)
+        mock_request.return_value = self._mock_response(
+            status=502, raise_for_status=http_error
+        )
+
+        with pytest.raises(ConjureHTTPError) as e:
+            self._test_service().testEndpoint("foo")
+        assert str(e.value) == (
+            "mocked http error. TraceId: 'None'. Response: '{}'".format(
+                body.decode()
+            )
+        )
+        assert e.value.error_code is None
+        assert e.value.error_name is None
+        assert e.value.error_instance_id is None
+        assert e.value.parameters == {}
+
+    @mock.patch("requests.Session.request")
     def test_http_error_empty_response(self, mock_request):
         resp = requests.Response()
         resp.status_code = 500

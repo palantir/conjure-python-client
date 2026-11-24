@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: >-
+    ConjureHTTPError no longer crashes when an error body is valid JSON
+    but not an object, and the error fields are always set.
+  links:
+  - https://github.com/palantir/conjure-python-client/pull/185
