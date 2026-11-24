@@ -278,17 +278,26 @@ class ConjureHTTPError(HTTPError):
     attributes extracted from the response."""
 
     _cause: Optional[HTTPError]
-    _error_code: str
-    _error_name: str
-    _error_instance_id: str
+    _error_code: Optional[str]
+    _error_name: Optional[str]
+    _error_instance_id: Optional[str]
     _parameters: Dict[str, str]
     _trace_id: str
 
     def __init__(self, http_error: HTTPError) -> None:
         self._cause = http_error
         self._trace_id = http_error.response.headers.get("X-B3-TraceId")
+        self._error_code = None
+        self._error_name = None
+        self._error_instance_id = None
+        self._parameters = dict()
         try:
             detail = http_error.response.json()
+        except ValueError:
+            detail = None
+        # a body can be valid JSON without being a SerializableError,
+        # e.g. a proxy answering with a bare string
+        if isinstance(detail, dict):
             self._error_code = detail.get("errorCode")
             self._error_name = detail.get("errorName")
             self._error_instance_id = detail.get("errorInstanceId")
@@ -304,7 +313,7 @@ class ConjureHTTPError(HTTPError):
                     self._parameters,
                 )
             )
-        except ValueError:
+        else:
             message = "{}. TraceId: '{}'. Response: '{}'".format(
                 http_error, self._trace_id, http_error.response.text
             )
@@ -331,17 +340,17 @@ class ConjureHTTPError(HTTPError):
         return self._cause
 
     @property
-    def error_code(self) -> str:
+    def error_code(self) -> Optional[str]:
         """A fixed code word identifying the type of error."""
         return self._error_code
 
     @property
-    def error_name(self) -> str:
+    def error_name(self) -> Optional[str]:
         """A fixed name identifying the error."""
         return self._error_name
 
     @property
-    def error_instance_id(self) -> str:
+    def error_instance_id(self) -> Optional[str]:
         """A unique identifier for this error instance."""
         return self._error_instance_id
 
